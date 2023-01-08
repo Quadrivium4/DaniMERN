@@ -8,8 +8,7 @@ const port = 5000;
 const connectDB = require("./db")
 const {router} = require("./routes");
 
-app.use(express.json());
-app.use(express.static("public"));
+
 
 app.use(session({
     secret: process.env.SECRET,
