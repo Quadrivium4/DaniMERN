@@ -6,6 +6,8 @@ const { validateEmail, sendMail } = require("../utils");
 
 const login = async (req, res) => {
     const { email, password } = req.body;
+    console.log(req.body);
+    console.log(email, password);
     let user = await User.findOne({
         email: email,
     })
