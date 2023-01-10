@@ -1,0 +1,48 @@
+#pop-layer {
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+}
+
+#pop-up {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20vh;
+    background-color: white;
+    box-shadow: 0px 0px 10px 1px rgb(34, 34, 34);
+    border-radius: 10px;
+    width: 300px;
+    padding: 15px;
+
+}
+
+#pop-up #pop-body {
+    display: flex;
+    flex-direction: column;
+}
+
+#pop-up #pop-body input[type="text"] {
+    all: unset;
+    padding: 10px 20px;
+    font-size: 20px;
+    background-color: rgb(226, 226, 226);
+    margin-top: 10px;
+}
+
+#pop-up #pop-body button {
+    all: unset;
+    background-color: rgb(63, 63, 63);
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 18px;
+    margin: 10px 0px;
+
+}

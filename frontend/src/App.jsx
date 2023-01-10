@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import Login from "./components/Login"
 
 const Example = () => {
     let [user, setUser] = useState("red");
@@ -12,6 +13,7 @@ const Example = () => {
         }else{
             setUser("red");
         }
+
     }
     return (
         <div id={user}>
@@ -23,9 +25,10 @@ const Example = () => {
 const App = () =>{
     return(
             <div id="app">
-                <input type="text"></input>
+                <input type="text" />
                 <input type="button" value="" />
                 <Example />
+                <Login />
             </div>
     )
 }
