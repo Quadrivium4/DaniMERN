@@ -1,6 +1,7 @@
 
 const login = async(email,password) => {
-    fetch("https://dani-courses.onrender.com/login", {
+    console.log("hello");
+    /*const data = await fetch("https://dani-courses.onrender.com/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -10,10 +11,11 @@ const login = async(email,password) => {
             password
         })
     })
-    .then(res => res.json())
-    .then((data) => {
-        return data;
-    });
+    .then(res => res.json());
+    
+    console.log(data);*/
+    let data = await fetch("https://dani-courses.onrender.com/store").then(res=>res.json());
+    return data;
            /* console.log(data)
             if (data.ok) {
                 if(data.role === "admin"){

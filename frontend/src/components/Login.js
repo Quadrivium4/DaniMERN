@@ -1,15 +1,15 @@
 import Pop from "./Pop";
-import { useState } from "react";
+import { useState, useCallback} from "react";
 import { login } from "../controllers";
 
 const Login = () =>{
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const handleLogin = async() =>{
+    const handleLogin = useCallback(async() =>{
         console.log(email, password);
         const data = await login(email, password);
         console.log(data);
-    }
+    }, [email, password])
     return(
             <div id="login">
                 <Pop>
