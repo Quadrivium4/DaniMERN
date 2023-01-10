@@ -9,6 +9,7 @@ const port = 5000;
 const connectDB = require("./db")
 const {router} = require("./routes");
 
+app.use(express.json())
 
 app.use(cors({
     origin: ["http://localhost:3000", "https://dani-courses-client.onrender.com"]
