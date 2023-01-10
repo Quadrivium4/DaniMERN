@@ -5,6 +5,7 @@ const SALT_ROUNDS = 10;
 const { validateEmail, sendMail } = require("../utils");
 
 const login = async (req, res) => {
+    console.log(req.body)
     const { email, password } = req.body;
     console.log(req.body);
     console.log(email, password);
