@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
+const cors = require("cors");
 const MongoStore = require("connect-mongo");
 
 const app = express();
@@ -9,7 +10,9 @@ const connectDB = require("./db")
 const {router} = require("./routes");
 
 
-
+app.use(cors({
+    origin: ["http://localhost:3000", "https://dani-courses-client.onrender.com"]
+}))
 app.use(session({
     secret: process.env.SECRET,
     cookie: {
