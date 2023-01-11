@@ -84,7 +84,9 @@ const registerConfirmation = async (req, res) => {
         })
         console.log("user verified", verifiedUser);
         req.session.userEmail = verifiedUser.email;
-        res.redirect("/user/dashboard.html");
+        let redirectUrl = req.protocol + "://" + req.get("host") + "/dashboard";
+        console.log("redirecting...", redirectUrl)
+        res.redirect( redirectUrl);
     } else {
         return res.status(400).send({ ok: false, message: "invalid link" });
     }
