@@ -14,6 +14,8 @@ app.use(express.json())
 app.use(cors({
     origin: ["http://localhost:3000", "https://dani-courses-client.onrender.com"]
 }))
+const os = require("os");
+console.log(os.hostname())
 app.use(session({
     secret: process.env.SECRET,
     cookie: {
