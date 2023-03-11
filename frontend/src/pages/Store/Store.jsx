@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import {Link} from "react-router-dom";
 import { useUser, useUserDispatch } from "../../Context";
+import {baseUrl} from "../../App"
 import "./Store.css"
 
 const Store = () => {
@@ -14,7 +15,7 @@ const Store = () => {
     useEffect(()=>{
         console.log("store",store)
         if(!store){
-            fetch("http://localhost:1234/store").then(res=>res.json()).then(data=>{
+            fetch(baseUrl+ "/store").then(res=>res.json()).then(data=>{
                 console.log(data)
                 dispatch({type: "SET_STORE", value: data.courses});
             })
@@ -29,7 +30,7 @@ const Store = () => {
 
                         <div key={course.id} className="product">
                             <Link to={"/product"} state={course}>
-                                <img className="course-img" alt="course-img" src={"http://localhost:1234/assets/images/" + course.coverImg} />
+                                <img className="course-img" alt="course-img" src={baseUrl+ "/assets/images/" + course.coverImg} />
                                 <h2 className="title">{course.name}</h2>
                                 <h2 id="price">€{(course.price/100).toFixed(2)}</h2>
                                 <div id="layer"></div>

@@ -2,12 +2,11 @@ import { useEffect, useState, useRef} from "react"
 import { Link, useNavigate } from "react-router-dom";
 import { useUser, useUserDispatch } from "../../Context";
 import { logout, getCourses, getSubcourses, getReviews, deleteReview, deleteUser } from "../../controllers";
-import { assetsUrl } from "../../App";
+import { assetsUrl, baseUrl, protectedUrl } from "../../App";
 import FileUpload from "../../components/FileUpload/FileUpload";
 import ProgressBar from "../../components/ProgressBar/ProgressBar";
 import uploadIcon from '../../assets/icons/carica.png';
 import accountImg from "../../assets/images/account-picture.png"
-import { baseUrl } from "../../App";
 import "./Dashboard.css"
 
 const Dashboard = () => {
@@ -52,7 +51,7 @@ const Dashboard = () => {
         const formData = new FormData()
         formData.append('file', img)
         formData.append("type", "video")
-        fetch('http://localhost:1234/protected/user/upload', {
+        fetch( protectedUrl+ '/user/upload', {
             withCredentials: true,
             credentials: "include",
             method: 'POST',
@@ -75,7 +74,7 @@ const Dashboard = () => {
         formData.append("description",description)
         formData.append("type", "video");
         const req = new XMLHttpRequest();
-        req.open("POST", 'http://localhost:1234/protected/user/upload/videos')
+        req.open("POST",protectedUrl+ '/user/upload/videos')
         req.withCredentials = true;
         req.credentials = "include";
         setVideoUploadProgress(0)
@@ -207,7 +206,7 @@ const Dashboard = () => {
                 <div className="scroller-wrap">
                     <div className="scroller">
                         {status === "loading"? <p>loading</p> : courses?.map(course=>{
-                            let image = "http://localhost:1234/assets/images/" + course.coverImg;
+                            let image = baseUrl + "/assets/images/" + course.coverImg;
                             return (
                                 <Link to="/view" state={{type: "course", id: course._id }} key={course._id}>
                                     <div className="course" >
@@ -223,7 +222,7 @@ const Dashboard = () => {
                 <div className="scroller-wrap">
                     <div className="scroller">
                         {status === "loading"? <p>loading</p> : subcourses?.map(subcourse=>{
-                            let image = "http://localhost:1234/assets/images/" + subcourse.coverImg;
+                            let image = baseUrl+ "/assets/images/" + subcourse.coverImg;
                             return (
                                 <Link to="/view" state={{type: "subcourse", id: subcourse._id }} key={subcourse._id}>
                                     <div className="subcourse" >
