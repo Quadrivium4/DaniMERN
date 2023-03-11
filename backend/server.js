@@ -37,7 +37,7 @@ app.use(fileUpload());
 
 
 app.use(cors({
-    origin: ["http://localhost:3000", "http://localhost:8080"],
+    origin: ["http://localhost:3000", "http://localhost:8080", "https://dani-courses-client.onrender.com"],
     methods: ["POST", "PUT", "GET","DELETE", "OPTIONS", "HEAD"],
     credentials: true
 }))
