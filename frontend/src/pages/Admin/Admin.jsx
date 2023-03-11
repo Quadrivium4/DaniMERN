@@ -15,6 +15,7 @@ import { logout, getSubcourses, getCourses, getReviews } from "../../controllers
 import "./Admin.css"
 import FileUpload from "../../components/FileUpload/FileUpload";
 import { downloadFile } from "../../utils";
+import { baseUrl } from "../../App";
 
 const Admin= () => {
     const navigate = useNavigate();
@@ -72,7 +73,7 @@ const Admin= () => {
                     return (
                         <div className="course product" key={course._id}>
                             <div className="cover">
-                                <img src={"http://localhost:1234/assets/images/" + course.coverImg} alt="course-img" className="course-img" />
+                                <img src={baseUrl + "/assets/images/" + course.coverImg} alt="course-img" className="course-img" />
                                 <p>{course.name}</p>
                             </div>
                             
@@ -106,7 +107,7 @@ const Admin= () => {
                 <div id="subcourses">
                     <h1>Sottocorsi</h1>
                     {subcourses?.map(subcourse=>{
-                        let image = "http://localhost:1234/assets/images/" + subcourse.coverImg;
+                        let image = baseUrl + "/assets/images/" + subcourse.coverImg;
                         return (
                             <div className="subcourse product" key={subcourse._id}>
                                 <div className="cover">
@@ -215,7 +216,7 @@ const EditCourse = ({course, subcourses, action}) =>{
                 }} 
                 imgPreview={imgPreview} 
                 type="image" 
-                defaultFileSrc={"http://localhost:1234/assets/images/" +course.coverImg}>
+                defaultFileSrc={baseUrl+ "/assets/images/" +course.coverImg}>
                     <img ref={imgPreview} alt="a preview of img selcted" className="img-preview" />
                 </FileUpload>
                 <p>Subcourses:</p>
@@ -293,7 +294,7 @@ const EditSubcourse = ({ subcourse, action}) =>{
                 }} 
                 imgPreview={imgPreview} 
                 type="image" 
-                defaultFileSrc={"http://localhost:1234/assets/images/" +subcourse.coverImg}>
+                defaultFileSrc={baseUrl+ "/assets/images/" +subcourse.coverImg}>
                     <img ref={imgPreview} alt="a preview of img selcted" className="img-preview" />
                 </FileUpload>
                 <p>Hashed Id:</p>
