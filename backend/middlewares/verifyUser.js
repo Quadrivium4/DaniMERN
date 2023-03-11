@@ -2,6 +2,7 @@ const { NOT_LOGGED_IN, USER_NOT_FOUND}  = require("../constants/errorCodes");
 const {User} = require("../models");
 const verifyUser = async (req, res, next) => {
     const email = req.session.userEmail;
+    console.log(req.session, )
     console.log({email: req.session.userEamail})
     if (!email) throw new AppError(NOT_LOGGED_IN, 403, "You should be logged in");
     const user = await User.findOne({ email });

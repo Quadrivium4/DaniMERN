@@ -45,12 +45,15 @@ app.use("/assets", express.static("./public"))
 app.use(session({
     secret: process.env.SECRET,
     cookie: {
+        secure: true,
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
-        httpOnly: true
+        httpOnly: true,
+        sameSite: "none"
     },
     
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     store: MongoStore.create({
         mongoUrl: process.env.MONGO_URI,
         dbName: "Store"
