@@ -1,0 +1,7 @@
+:root{
+    --dark: rgb(0, 0, 20);
+    --medium: rgb(15, 20, 55);
+    --light: rgb(33, 50, 100);
+    --extra-light: rgb(80, 96, 136);
+    --primary: rgb(33, 50, 100);
+}

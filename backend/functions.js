@@ -1,5 +1,3 @@
-
-
 const crud = async (schema, action, options) => {
     switch(action){
         case "read": 

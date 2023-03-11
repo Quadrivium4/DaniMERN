@@ -1,0 +1,13 @@
+#view {
+    flex-direction: column;
+}
+#view .videos{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+#view  .videos .video{
+
+    max-width: 50%;
+    min-width: 300px;
+}

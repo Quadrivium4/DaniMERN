@@ -1,0 +1,38 @@
+#product {
+    width: 100%;
+    display: flex;
+}
+
+#product .course{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+#product .course img{
+    width: 100%
+}
+#product .course a,  #product .course button {
+    width: 100%;
+}
+#product .subcourses {
+    display: flex;
+    width: 100%;
+}
+#product .subcourse{
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+}
+#product .price{
+    width: 100%;
+    text-align: center;
+    background: white;
+    color: black;
+    font-size: 20px;
+    padding: 5px;
+}
+#product .subcourse-img{
+    width: 100%;
+}

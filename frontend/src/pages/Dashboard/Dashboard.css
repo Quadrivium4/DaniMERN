@@ -1,0 +1,174 @@
+:root {
+    --color1: rgb(34, 34, 34);
+    --dark: rgb(0, 0, 20);
+    --medium: rgb(15, 20, 55);
+    --light: rgb(33, 50, 100);
+}
+
+#dashboard {
+    display: flex;
+    height: 100%;
+    padding: 30px;
+    gap: 20px;
+}
+#dashboard .section {
+    background-color: var(--dark);
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+}
+#dashboard .scroller-wrap {
+    display: flex;
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+#dashboard .scroller {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: var(--medium);
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    word-break: break-all;
+}
+
+#dashboard .section .sub-section h1{
+    text-align: center;
+}
+#dashboard .section .sub-section {
+    width: 90%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    column-gap: 2px;
+    margin-bottom: 20px;
+
+}
+#dashboard .section .info{
+    display: flex;
+}
+#dashboard #reviews #post-review {
+    position: relative;
+    display: flex;
+    height: auto;
+    flex-direction: row;
+}
+#dashboard #reviews #post-review .FileUpload {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+#dashboard #reviews #post-review .FileUpload img{
+    width: 100%;
+    min-width: 90px;
+    max-width: 150px;
+}
+#dashboard #reviews #post-review>div{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background: var(--medium);
+}
+
+#dashboard .FileUpload input[type="file"]{
+    display: none;
+}
+#dashboard #reviews #post-review label{
+        cursor: pointer;
+}
+#dashboard #reviews #post-review img{
+    width: 150px;
+}
+
+#dashboard #reviews #post-review .layer {
+    position: absolute;
+}
+#dashboard #reviews #post-review button {
+    width: 100%;
+    color: white;
+    font-size: 22px;
+    padding: 5px;
+}
+#dashboard #reviews #post-review .description {
+    background: var(--light);
+}
+#dashboard #reviews #post-review .description h2{
+    padding: 5px;
+}
+#dashboard #reviews #post-review textarea {
+    background:var(--medium);
+    height: 100%;
+    width: 100%;
+    color: white;
+}
+
+
+#dashboard #reviews #my-reviews .review {
+    background: var(--light);
+    margin: 5px;
+    padding: 10px;
+}
+#dashboard #reviews #my-reviews .review h3{
+    word-break: break-all;
+}
+#dashboard .section .info .fields{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    width: 100%;
+}
+#dashboard #user .info .FileUpload{
+    width: 30%;
+    min-width: 70px;
+}
+
+#dashboard #user img {
+    width: 100%;
+}
+#dashboard #user button {
+    margin-top: 10px;
+}
+#dashboard #purchases .scroller{
+    flex-direction: row;
+    flex-wrap: wrap;
+    
+}
+#dashboard .course{
+    background: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 0 21%;
+    font-size: 22px;
+    word-break: keep-all;
+}
+#dashboard .subcourse {
+    background: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 0 21%;
+    font-size: 22px;
+    word-break: keep-all;
+}
+ #dashboard .course img{
+    width: 100%;
+}
+#dashboard .subcourse img {
+    width: 100%;
+    min-width: 100px;
+    max-width: 200px;
+}

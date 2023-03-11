@@ -1,3 +1,4 @@
+@import "../root.css";
 #pop-layer {
     background-color: rgba(0, 0, 0, 0.5);
     width: 100vw;
@@ -15,9 +16,10 @@
     display: flex;
     flex-direction: column;
     margin-top: 20vh;
-    background-color: white;
+    color: black;
+    background-color: var(--medium);
     box-shadow: 0px 0px 10px 1px rgb(34, 34, 34);
-    border-radius: 10px;
+    border-radius: 5px;
     width: 300px;
     padding: 15px;
 
@@ -28,21 +30,32 @@
     flex-direction: column;
 }
 
-#pop-up #pop-body input[type="text"] {
-    all: unset;
-    padding: 10px 20px;
-    font-size: 20px;
-    background-color: rgb(226, 226, 226);
-    margin-top: 10px;
-}
-
 #pop-up #pop-body button {
-    all: unset;
-    background-color: rgb(63, 63, 63);
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    font-size: 18px;
     margin: 10px 0px;
 
+}
+#pop-up #close-pop {
+    align-self: flex-end;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 20px;
+    height: 20px;
+}
+
+#pop-up #close-pop span {
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    background-color: rgb(255, 255, 255);
+}
+
+#pop-up #close-pop span[n="1"] {
+    transform: rotateZ(45deg);
+}
+
+#pop-up #close-pop span[n="2"] {
+    transform: rotateZ(-45deg);
 }

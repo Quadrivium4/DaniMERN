@@ -1,0 +1,63 @@
+@import "../../root.css";
+#checkout {
+    gap: 20px;
+    padding: 20px;
+}
+#checkout section{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background: var(--dark);
+}
+#checkout section h1{
+    text-align: center;
+}
+#checkout .course-info img{
+    width: 100%;
+    max-width: 300px;
+}
+#checkout .data .register {
+    display: flex;
+    flex-direction: column;
+}
+#checkout .data input, #checkout .data  button{
+    max-width: 350px;
+}
+#checkout .data #message{
+    margin-top: 10px;
+}
+#checkout .payment .payment-options {
+    display: flex;
+    gap: 10px;
+}
+#checkout .payment .payment-option {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 3px solid var(--light);
+    padding: 15px;
+}
+#checkout .payment .payment-option p{
+    text-align: center;
+    margin: 10px;
+    font-size: 20px;
+    
+}
+#checkout .payment .logo{
+    width: 100%;
+    max-width: 150px;
+}
+#checkout .payment #paypal-button{
+    margin-top: 10px;
+}
+#checkout .payment #stripe-form{
+    display: flex;
+    flex-direction: column;
+}
+#checkout .payment #stripe-form #card-element{
+    background: var(--extra-light);
+    padding: 10px 20px;
+    margin: 10px 0px;
+}

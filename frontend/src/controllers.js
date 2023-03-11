@@ -1,75 +1,60 @@
-
+import { crossing } from "./utils";
+let baseUrl = process.env.NODE_ENV === "production" ? process.env.REACT_APP_ONLINE_SERVER_URL : process.env.REACT_APP_LOCAL_SERVER_URL;
+let protectedUrl = process.env.NODE_ENV === "production" ? process.env.REACT_APP_ONLINE_SERVER_URL + "/protected" : process.env.REACT_APP_LOCAL_SERVER_URL + "/protected";
+console.log(baseUrl, protectedUrl)
 const login = async(email,password) => {
-    console.log("hello");
-    /*const data = await fetch("https://dani-courses.onrender.com/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
+    let url = baseUrl + "/login";
+    return await crossing(url,"POST",{
             email,
             password
         })
-    })
-    .then(res => res.json());
-    
-    console.log(data);*/
-    let data = await fetch("https://dani-courses.onrender.com/store").then(res=>res.json());
-    return data;
-           /* console.log(data)
-            if (data.ok) {
-                if(data.role === "admin"){
-                    location.replace("./admin/index.html");
-                }else{
-                    location.replace("./user/dashboard.html");
-                }
-                localStorage.setItem("loggedIn", true);
-                message(data.message, "success")
-            } else {
-                message(data.message, "failure")
-            }
-
-        }).catch((err) => {
-            console.log(err);
-        })*/
 }
-/*
-function register(name, email, password) {
-    fetch("/register", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
+const register = async(name, email, password)=> {
+    let url = baseUrl + "/register";
+    return await crossing(url,"POST",{
             name,
             email,
             password
         })
-    }).then(res => res.json()).then((data) => {
-        console.log(data)
-        if (data.ok) {
-            message(data.message, "success")
-        } else {
-            message(data.message, "failure")
-        }
-    }).catch(error => {
-        alert("ther was an error!")
-        console.log(error)
-    })
 }
-
-function logout() {
-    fetch("/logout").then(res => res.json()).then((data) => {
-        message(data.message, "success");
-        localStorage.setItem("loggedIn", false)
-    }).catch(error => {
-        message(data.message, "failure")
-        console.log(error)
-    })
+const logout = async() => {
+    return await crossing(protectedUrl + "/logout");
 }
-*/
+const getUser = async() =>{
+    return await crossing(protectedUrl + "/user");
+}
+const getCourse = async (id) => {
+    return await crossing(protectedUrl + "/course/" + id);
+}
+const getSubcourse = async (id) => {
+    return await crossing(protectedUrl + "/subcourse/" + id);
+}
+const getSubcourses = async () => {
+    return await crossing(protectedUrl + "/subcourse", "GET")
+}
+const getCourses = async () => {
+    return await crossing(protectedUrl + "/course", "GET")
+}
+const getReviews = async()=>{
+    console.log('reviews')  
+    return await crossing(protectedUrl + "/review")
+}
+const deleteReview = async(id) =>{
+    return await crossing(protectedUrl+ "/review/" + id, "DELETE");
+}
+const deleteUser = async() =>{
+    return await crossing(protectedUrl + "/user", "DELETE")
+}
 export {
     login,
-    /*register,
-    logout*/
+    register,
+    logout,
+    getUser,
+    getCourse,
+    getSubcourse,
+    getCourses,
+    getSubcourses,
+    getReviews,
+    deleteReview,
+    deleteUser
 }
