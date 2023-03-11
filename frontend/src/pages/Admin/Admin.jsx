@@ -24,21 +24,28 @@ const Admin= () => {
     const [popContent, setPopContent] = useState();
     const [reviews, setReviews] = useState() 
     useEffect(()=>{
+        console.log(courses, subcourses)
         if(!courses || !subcourses){
             const getData = async()=>{
                 console.log("get Data runned")
-                const {courses} = await getCourses();
-                const {subcourses} = await getSubcourses();
-                dispatch({type: "SET_COURSES", value: courses});
-                dispatch({type: "SET_SUBCOURSES", value: subcourses});
+                let {courses: coursesData} = await getCourses();
+                let {subcourses: subcoursesData} = await getSubcourses();
+                
+                if(!coursesData) coursesData = [];
+                if(!subcoursesData) subcoursesData = [];
+                console.log(coursesData, subcoursesData)
+                dispatch({type: "SET_COURSES", value: coursesData});
+                dispatch({type: "SET_SUBCOURSES", value: subcoursesData});
             }
             getData()
         }
         if(!reviews) {
             console.log("hello")
             getReviews().then(data=>{
-            console.log("data",data)
-            setReviews(data.reviews);
+                let reviewsData= data.reviews;
+                if(!reviewsData) reviewsData = [];
+                console.log("data",reviewsData)
+                setReviews(reviewsData);
         });
         }
     })
