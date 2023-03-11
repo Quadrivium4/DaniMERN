@@ -1,7 +1,6 @@
+
+import { baseUrl, protectedUrl } from "./App";
 import { crossing } from "./utils";
-let baseUrl = process.env.NODE_ENV === "production" ? process.env.REACT_APP_ONLINE_SERVER_URL : process.env.REACT_APP_LOCAL_SERVER_URL;
-let protectedUrl = process.env.NODE_ENV === "production" ? process.env.REACT_APP_ONLINE_SERVER_URL + "/protected" : process.env.REACT_APP_LOCAL_SERVER_URL + "/protected";
-console.log(baseUrl, protectedUrl)
 const login = async(email,password) => {
     let url = baseUrl + "/login";
     return await crossing(url,"POST",{
