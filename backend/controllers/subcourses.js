@@ -42,7 +42,7 @@ const postSubcourse = async (req, res) => {
     const { name, description, price, hashedId } = req.body;
     let user = req.user
     if (user.role == "admin") {
-        const coverImgName = await saveFile(req.files.img, path.join(__dirname, "../public", "images"));
+        const coverImgName = await saveFile(req.files.coverImg, path.join(__dirname, "../public", "images"));
         Subcourse.create({
             name,
             description,
