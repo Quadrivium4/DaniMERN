@@ -1,36 +1,28 @@
-import React, {useState} from "react";
-import Login from "./components/Login"
+import Pages from "./pages/Pages";
+import Header from "./components/Header/Header";
+import Footer from "./components/Footer/Footer"
+import { BrowserRouter as Router, Link } from "react-router-dom";
+import {Context} from "./Context.js";
+import "./App.css"
 
-const Example = () => {
-    let [user, setUser] = useState("red");
-    let propreties = {
-        backgroundColor: user,
-        padding: "30px"
-    }
-    const handleClick = () => {
-        if(propreties.backgroundColor === "red"){
-            setUser("greenyellow");
-        }else{
-            setUser("red");
-        }
-
-    }
-    return (
-        <div id={user}>
-            <h1 style={propreties} lem="coc">{user}</h1>
-            <button onClick={handleClick}>Click me</button>
-        </div>
-    )
-}
+export const baseUrl =  process.env.NODE_ENV === "production" ? 
+                process.env.REACT_APP_ONLINE_SERVER_URL : 
+                process.env.REACT_APP_LOCAL_SERVER_URL;
+export const protectedUrl =  process.env.NODE_ENV === "production" ? 
+                    process.env.REACT_APP_ONLINE_SERVER_URL + "/protected" : 
+                    process.env.REACT_APP_LOCAL_SERVER_URL + "/protected";
+export const assetsUrl = baseUrl + "/assets/users";
 const App = () =>{
     return(
-            <div id="app">
-                <input type="text" />
-                <input type="button" value="" />
-                <Example />
-                <Login />
-            </div>
+            <Context>
+                <Router>
+                    <Header />
+                    <Pages />
+                    <Footer />
+                </Router>
+            </Context>
     )
 }
+
 
 export default App;

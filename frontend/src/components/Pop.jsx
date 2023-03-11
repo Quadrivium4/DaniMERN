@@ -1,12 +1,18 @@
 import "./Pop.css"
 
-const Pop = (body) =>{
-    console.log(body);
+const Pop = ({children, toggle}) =>{
+    const handleClick = () =>{
+        toggle();
+    }
     return (
         <div id="pop-layer">
             <div id="pop-up">
+                <div id="close-pop" onClick={handleClick}>
+                    <span n="1"></span>
+                    <span n="2"></span>
+                </div>
                 <div id="pop-body">
-                    {body.children}
+                    {children}
                 </div>
             </div>
         </div>)

@@ -1,37 +1,69 @@
 const express = require('express');
-const router = express.Router();
-const { login, register, getUser, logout, registerConfirmation} = require("./controllers/user");
-const {postCourse, putCourse, getCourse, getCourses, getStore, deleteCourse} = require("./controllers/courses")
+const protectedRouter = express.Router();
+const publicRouter = express.Router();
+
+const { login, register, getUser, uploadUserImg, logout, registerConfirmation, uploadUserVideo, deleteUser} = require("./controllers/user");
+const {postCourse, putCourse, getCourse, getPublicCourse, getCourses, getStore, deleteCourse, testUpload} = require("./controllers/courses")
 const { postSubcourse, putSubcourse, getSubcourse, getSubcourses, deleteSubcourse } = require("./controllers/subcourses");
-const { verifyLogin, purchase } = require("./utils");
+const {getReviews, postReview, deleteReview, putReview} = require("./controllers/reviews")
+const {confirmPaymentIntent,createPaymentIntent, stripeEvents, createPaypalOrder, capturePaypalOrder, approvePaypalOrder, validateCredentials} = require("./controllers/payment");
+const { tryCatch } = require("./utils");
+const { verifyUser} = require("./middlewares/verifyUser");
+const { errorHandler} = require("./middlewares/errorHandler");
 
-router.route("/subcourse")
-    .get(verifyLogin, getSubcourses)
-    .post(verifyLogin, postSubcourse)
+console.log(verifyUser)
+protectedRouter.use(tryCatch(verifyUser));
+protectedRouter.route("/test-upload").post(tryCatch(testUpload));
+protectedRouter.route("/subcourse")
+    .get(tryCatch(getSubcourses))
+    .post(tryCatch(postSubcourse))
+    .put(tryCatch(putSubcourse))
 
-router.route("/course")
-    .get(verifyLogin, getCourses)
-    .post(verifyLogin, postCourse)
+protectedRouter.route("/course")
+    .get(tryCatch(getCourses))
+    .post(tryCatch(postCourse))
+    .put(tryCatch(putCourse))
+protectedRouter.route("/review")
+    .get(tryCatch(getReviews))
+    .post(tryCatch(postReview))
+    .put(tryCatch(putReview))
 
-router.route("/subcourse/:id")
-    .get(verifyLogin, getSubcourse)
-    .put(verifyLogin, putSubcourse)
-    .delete(verifyLogin, deleteSubcourse)
+protectedRouter.route("/subcourse/:id")
+    .get(tryCatch(getSubcourse))
+    .delete(deleteSubcourse)
 
-router.route("/course/:id")
-    .get(verifyLogin, getCourse)
-    .put(verifyLogin, putCourse)
-    .delete(verifyLogin, deleteCourse)
+protectedRouter.route("/course/:id")
+    .get(tryCatch(getCourse))
+    .delete(tryCatch(deleteCourse))
 
-router.route("/store").get(getStore);
-router.route("/purchase").post(purchase);
-router.route("/verify/:userId/:token").get(registerConfirmation);
+protectedRouter.route("/review/:id")
+    .delete(tryCatch(deleteReview))
 
-router.route("/login").post(login)
-router.route("/register").post(register);
-router.route("/user").get(verifyLogin, getUser);
-router.route("/logout").get(verifyLogin, logout);
+
+protectedRouter.route("/user/upload").post(tryCatch(uploadUserImg))
+protectedRouter.route("/user/upload/videos").post(tryCatch(uploadUserVideo))
+protectedRouter.route("/user")
+    .get(tryCatch(getUser))
+    .delete(tryCatch(deleteUser))
+protectedRouter.route("/logout").get(tryCatch(logout))
+
+publicRouter.route("/create-payment-intent").post(tryCatch(createPaymentIntent))
+publicRouter.route("/confirm-payment-intent/:id").get(tryCatch(confirmPaymentIntent))
+
+publicRouter.route("/validate-credentials").post(tryCatch(validateCredentials))
+publicRouter.route("/create-paypal-order").post(tryCatch(createPaypalOrder));
+publicRouter.route("/approve-paypal-order").post(tryCatch(approvePaypalOrder));
+publicRouter.route("/capture-paypal-order/:id").get(tryCatch(capturePaypalOrder));
+
+publicRouter.route("/course/:id").get(tryCatch(getPublicCourse));
+publicRouter.route("/store").get(tryCatch(getStore));
+publicRouter.route("/verify/:userId/:token").get(tryCatch(registerConfirmation))
+publicRouter.route("/login").post(tryCatch(login))
+publicRouter.route("/register").post(tryCatch(register))
+publicRouter.route("/webhook").post(tryCatch(stripeEvents))
+
 
 module.exports = {
-    router
+    publicRouter,
+    protectedRouter
 }

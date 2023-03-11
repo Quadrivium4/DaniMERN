@@ -1,0 +1,5 @@
+@import "../../root.css";
+#footer {
+    padding: 20px;
+    background: var(--dark);
+}

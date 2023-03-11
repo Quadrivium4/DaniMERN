@@ -1,8 +1,11 @@
-const { User, Course, Subcourse, UnverifiedUser } = require("../models");
+require("dotenv").config();
+const { User, Course, Subcourse, Review, UnverifiedUser } = require("../models");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const path = require("path");
+const fs = require("fs");
 const SALT_ROUNDS = 10;
-const { validateEmail, sendMail } = require("../utils");
+const { validateEmail, sendMail, getNewFileName, deleteFile, uploadWistiaVideo, saveFile, tryCatch } = require("../utils");
 
 const login = async (req, res) => {
     console.log(req.body)
@@ -14,55 +17,140 @@ const login = async (req, res) => {
     })
     if (user) {
         console.log(user)
-        bcrypt.compare(password, user.password, (err, result) => {
+        bcrypt.compare(password, user.password, async(err, result) => {
             console.log(err)
-            if (err) return res.send({ ok: false, message: "Error occured, try again", error: err });
-            if (!result) return res.send({ ok: false, message: "Incorrect password" })
+            if (err) return res.status(500).send({ ok: false, message: "Error occured, try again", error: err });
+            if (!result) return res.status(401).send({ ok: false, message: "Incorrect password" })
             else {
                 req.session.userEmail = email;
-                return res.send({ ok: true, message: "User found", role: user.role })
+                let courses;
+                let subcourses;
+                if (user.role == "admin") {
+                    courses = await Course.find({});
+                    subcourses = await Subcourse.find({})
+                } else {
+                    console.log(user.courses)
+                    courses = await Course.find({
+                        _id: { $in: user.courses }
+                    });
+                    subcourses = await Subcourse.find({
+                        _id: { $in: user.subcourses }
+                    })
+                }
+                return res.send({ ok: true, message: "User found", user: user, courses, subcourses})
             }
         })
     } else {
-        return res.send({
+        return res.status(401).send({
             ok: false,
             message: `user with that email not found`,
         })
     }
 }
-const getUser = async (req, res) => {
-    let user = await User.findOne({
-        email: req.session.userEmail
-    })
-    if (user) {
-        let courses;
-        let subcourses;
-        if (user.role == "admin") {
-            courses = await Course.find({});
-            subcourses = await Subcourse.find({})
-        } else {
-            console.log(user.courses)
-            courses = await Course.find({
-                _id: { $in: user.courses }
-            });
-            subcourses = await Subcourse.find({
-                _id: { $in: user.subcourses }
-            })
-        }
-        return res.send({
-            ok: true,
-            message: `user found`,
-            user: user,
-            role: user.role,
-            courses: courses,
-            subcourses: subcourses
+const uploadUserImg = async(req, res) =>{
+    const user = req.user;
+    const email = user.email;
+    const fileName = await saveFile(req.files.file, path.join(__dirname, "../public", "users", `${user._id}`))
+    const newUser = await User.findOneAndUpdate({ email }, {
+        profileImg: fileName
+    }, {
+        new: true
+    });
+    if (user.profileImg) {
+        deleteFile(path.join("public", "users", `${user._id}`, user.profileImg));
+    }
+    console.log(newUser);
+    res.send({fileName})
+}
+const uploadUserVideo = async (req, res) => {
+    const email = req.session.userEmail;
+    const user = await User.findOne({email});
+    if(!user) return res.status(401).send({ok: false, message: "user not found" });
+    if (user.allowedReviews < 1) return res.status(403).send({ ok: false, message: "you have no allowed reviews" });
+    const file = req.files.file;
+    const {description} = req.body;
+    console.log("Uploading video...");
+    const data =  await uploadWistiaVideo(file);
+    if(data){
+        console.log(data);
+        const videoName = path.parse(path.basename(data.name)).name;
+        const review = await Review.create({
+            description,
+            userId: user._id,
+            video: {
+                name: videoName,
+                duration: data.duration,
+                hashedId: data.hashed_id,
+                previewImg: data.thumbnail.url
+            }
+        })
+        console.log(review)
+        console.log(user, "reviewsss", user.reviews)
+        let reviews = user.reviews;
+        reviews.push(review._id.toString());
+        const updatedUser = await User.findByIdAndUpdate(user._id,{
+            allowedReviews: user.allowedReviews - 1, 
+            reviews
+            
+        }, {
+            new: true
         });
+        sendMail(`
+            Hi Dani,
+            ${user.name} wants a feedback from you!
+            <a href="${process.env.CLIENT_URL}">Give It!</a>
+        `, "miguelgiacobbe@gmail.com", "New Review Request!").then(result =>{
+            console.log("email sent", result)
+        }).catch(err=>{
+            console.log("ops error!", err)
+        })
+        console.log(updatedUser)
+    }
+    
+    /*const email = req.session.userEmail;
+    const file = req.files.file;
+    const fileName = getNewFileName(file.name);
+    const oldUser = await User.findOneAndUpdate({ email }, {
+        profile_img: fileName
+    });
+    console.log(oldUser);
+    console.log(fileName)
+    if (oldUser.profileImg) {
+        deleteFile(path.join("public", "users", "images", oldUser.profileImg));
+    }
+
+
+    const filePath = path.join("public", "users", "images", fileName);
+
+    file.mv(filePath, err => {
+        if (err) return res.status(500).send(err);
+        res.send({ fileName });
+    })*/
+}
+const getUser = async (req, res) => {
+    const user = req.user;
+    let courses;
+    let subcourses;
+    if (user.role == "admin") {
+        courses = await Course.find({});
+        subcourses = await Subcourse.find({})
     } else {
-        res.send({
-            ok: false,
-            message: "user not found"
+        courses = await Course.find({
+            _id: { $in: user.courses }
+        });
+        subcourses = await Subcourse.find({
+            _id: { $in: user.subcourses }
         })
     }
+    return res.send({
+        ok: true,
+        message: `user found`,
+        user: user,
+        role: user.role,
+        courses: courses,
+        subcourses: subcourses
+    });
+
 }
 const registerConfirmation = async (req, res) => {
     const { userId, token } = req.params;
@@ -78,13 +166,24 @@ const registerConfirmation = async (req, res) => {
             name: unverifiedUser.name,
             email: unverifiedUser.email,
             password: unverifiedUser.password
+        });
+        const dirPath = path.join(__dirname, "../public/users/" + verifiedUser._id);
+        console.log(dirPath)
+        fs.mkdir(dirPath, (err)=>{
+            if(err) {
+                console.log(err)
+                return res.status(500).send({error: err});
+            }
+            console.log("Directory Created!")
+
         })
-        UnverifiedUser.findOneAndDelete({
+        const deletedUser = await UnverifiedUser.findOneAndDelete({
             _id: unverifiedUser._id
         })
+        console.log("unverified user deleted:", deletedUser)
         console.log("user verified", verifiedUser);
         req.session.userEmail = verifiedUser.email;
-        let redirectUrl = req.protocol + "://" + req.get("host") + "/dashboard";
+        let redirectUrl = process.env.CLIENT_URL + "verified";
         console.log("redirecting...", redirectUrl)
         res.redirect( redirectUrl);
     } else {
@@ -131,21 +230,49 @@ const register = async (req, res) => {
     }
 }
 const logout = (req, res) => {
+    console.log("try logout")
     req.session.destroy(err => {
         if (err) {
             return res.send({
+                ok: false,
                 message: "cannot log out"
             })
         }
         res.send({
+            ok: true,
             message: "succesfully logged out"
         })
     })
 }
+const deleteUser = async(req, res) =>{
+    const user = req.user;
+    const deletedUser = await User.findByIdAndDelete(user._id);
+    fs.rm(path.join(__dirname, "../public/users/" + user._id),{recursive: true}, (err)=>{
+        if(err){
+            console.log(err)
+            throw new AppError(1, 500, "Cannot delete directory");
+        }
+        console.log('directory deleted')
+    });
+    const deletedReviews = await Review.deleteMany({ _id: { $in: user.reviews } });
+    req.session.destroy(err => {
+        if (err) {
+            return res.send({
+                ok: false,
+                message: "cannot log out"
+            })
+        }
+    })
+    console.log("User deleted succesfully!")
+    res.send({ok: true, message: "User deleted succesfully!"})
+}
 module.exports = {
     login,
     getUser,
+    uploadUserImg,
+    uploadUserVideo,
     register,
     registerConfirmation,
-    logout
+    logout,
+    deleteUser
 }
