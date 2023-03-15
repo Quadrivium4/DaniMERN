@@ -5,7 +5,7 @@ import Product from "./Product/Product";
 import Verified from "./Verified";
 import Admin from "./Admin/Admin";
 import View from "./View/View";
-import Payment from "../components/Payment/Payment";
+import Payment from "./Payment/Payment";
 import {useUser} from "../Context";
 import Review from "./Review/Review";
 

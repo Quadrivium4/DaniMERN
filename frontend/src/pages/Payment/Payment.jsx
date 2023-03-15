@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate, redirect} from "react-router-dom";
 import {loadStripe} from "@stripe/stripe-js";
 import {Elements} from "@stripe/react-stripe-js";
 import StripeForm from "./StripeForm";
 import PaypalForm from "./PaypalForm";
 import { baseUrl } from "../../App";
 import { useUser, useUserDispatch } from "../../Context";
-import Message from "../Message";
-import Pop from "../Pop";
-import Login from "../Login";
-import { logout } from "../../controllers";
+import Message from "../../components/Message";
+import Pop from "../../components/Pop";
+import Login from "../../components/Login";
+import { getFile, logout } from "../../controllers";
 import { PayPalScriptProvider} from "@paypal/react-paypal-js";
 import "./Payment.css"
 import creditCards from "../../assets/icons/credit-cards.png";
@@ -31,7 +31,7 @@ function Payment(){
     })
     const [message, setMessage] = useState()
     const {isLogged, info, loading} = useUser();
-    const [isSubmitted, setIsSubmitted] = useState(true);
+    const [isSubmitted, setIsSubmitted] = useState(false);
     const dispatch = useUserDispatch();
     const [paymentType, setPaymentType] = useState();
     const [loginPop, setLoginPop] = useState(false)
@@ -60,7 +60,7 @@ function Payment(){
                 <>
                     <h2>{item.name}</h2>
                     <p>{item.description}</p>
-                    <img src={baseUrl + "/assets/images/" + item.coverImg}></img>
+                    <img src={getFile(item.coverImg)} alt={item.description}></img>
                     <h2>€{(item.price/100).toFixed(2)}</h2>
                     {item.subcourses? <div>
                         <h3>Subcourses:</h3>
@@ -79,42 +79,49 @@ function Payment(){
             : <p>loading</p>}
             </section>
             <section className="data">
-                <h1>Registrati</h1>
+                
             {
                 !isLogged && !loading? 
                 <>
-                        
+                        <h1>Registrati</h1>
                         <p>Already have an account? <button onClick={()=>setLoginPop(true)}>Login</button></p>
-                        <h3>Name:</h3>
-                        <input name="name" onChange={(e)=> setCredentials({...credentials, name: e.target.value})} value={credentials.name}  onFocus={()=>setMessage(false)} disabled={isSubmitted} required></input>
-                        <h3>Email:</h3>
-                        <input name="email" type="email" onChange={(e)=>setCredentials({...credentials, email: e.target.value})} value={credentials.email}  onFocus={()=>setMessage(false)} disabled={isSubmitted}  required ></input>
-                        <h3>Password:</h3>
-                        <input name="password" onChange={(e)=>setCredentials({...credentials, password: e.target.value})} value={credentials.password} onFocus={()=>setMessage(false)} disabled={isSubmitted} required />
-                        {/*Boolean(paymentType)? <button onClick={()=>setPaymentType(false)}>change</button>: null*/}
-                        {isSubmitted? <button onClick={()=>setIsSubmitted(false)}>Change</button>: 
-                        <button onClick={async()=>{
-                            let err = await validateCredentials();
-                            if(err) return setMessage({content: err.message, type: "error"});
-                            setIsSubmitted(true);
-                        }}>Submit</button>}
+                        <div className="form">
+                            <h3>Name:</h3>
+                            <input name="name" onChange={(e)=> setCredentials({...credentials, name: e.target.value})} value={credentials.name}  onFocus={()=>setMessage(false)} disabled={isSubmitted} required></input>
+                            <h3>Email:</h3>
+                            <input name="email" type="email" onChange={(e)=>setCredentials({...credentials, email: e.target.value})} value={credentials.email}  onFocus={()=>setMessage(false)} disabled={isSubmitted}  required ></input>
+                            <h3>Password:</h3>
+                            <input name="password" onChange={(e)=>setCredentials({...credentials, password: e.target.value})} value={credentials.password} onFocus={()=>setMessage(false)} disabled={isSubmitted} required />
+                            {/*Boolean(paymentType)? <button onClick={()=>setPaymentType(false)}>change</button>: null*/}
+                            {isSubmitted? <button onClick={()=>setIsSubmitted(false)}>Change</button>: 
+                            <button onClick={async()=>{
+                                let err = await validateCredentials();
+                                console.log(err)
+                                if(err) return setMessage({content: err.message, type: "error"});
+                                setIsSubmitted(true);
+                            }}>Submit</button>}
+                        </div>
                     </>: isLogged?
-                <div id="info">
+                <>
                     <h1>info</h1>
-                    <p>Name: {info.name}</p>
-                    <p>Email: {info.email}</p>
-                    <button onClick={async()=>{
-                        let data = await logout();
-                        console.log("logout data",data)
-                        if(data.ok){
-                            console.log("redirecting")
-                            //redirect("/");
-                            dispatch({type: "RESET", value: null});
-                        }else{
-                            console.log(data.message)
-                        }
-                        }}>log out</button>
-                </div> : <p>loading</p>
+                    <div className="form">
+                        <h3>Name:</h3>
+                        <input type="text" value={info.name} disabled/>
+                        <h3>Email:</h3>
+                        <input type="text" value={info.email} disabled/>
+                        <button onClick={async()=>{
+                            let data = await logout();
+                            console.log("logout data",data)
+                            if(data.ok){
+                                console.log("redirecting")
+                                redirect("/")
+                                dispatch({type: "RESET", value: null});
+                            }else{
+                                console.log(data.message)
+                            }
+                            }}>log out</button>
+                    </div>
+                </> : <p>loading</p>
                 
             }
             {message? <Message type={message.type} content={message.content} toggle={()=>setMessage(false)}></Message>: null}
@@ -145,10 +152,10 @@ function Payment(){
                 <>
                 <PayPalScriptProvider options={{"client-id": "AdP17URr89DbDrFV6yo1WEHC1F0lf900hz8oqXaH2I8_BMgmu5ZIukifi328vMSQurAbAuSCY_OqQjbT", currency: "EUR"}}>
                     <Elements stripe={stripePromise}>
-                    {stripePromise && paymentType === "credit-card" && isSubmitted ? (
+                    {stripePromise && paymentType === "credit-card" && isSubmitted? (
                         <StripeForm itemId={item.id} itemType={item.subcourses? "course": "subcourse"} credentials={credentials}/>
                     ) : paymentType === "paypal" && isSubmitted?
-                        <PaypalForm  itemId={item.id} itemType={item.subcourses? "course": "subcourse"} credentials={credentials} setMessage={setMessage}></PaypalForm>
+                        <PaypalForm  itemId={item.id} itemType={item.subcourses? "course": "subcourse"} credentials={credentials} />
                     : null
                     }
                     </Elements>

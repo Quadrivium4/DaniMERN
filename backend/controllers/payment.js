@@ -1,21 +1,17 @@
 require("dotenv").config();
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const { User, Course, Subcourse, PaypalOrder } = require("../models");
 const { sendMail } = require("../utils");
+
 const { register } = require("../utils/user");
 const path = require("path");
 const fs = require("fs");
 const { createOrder, capturePayment, retrieveOrder } = require("../utils/paypal");
+const {getStripeCustomer,  createStripeCustomer, confirmStripePayment, getStripePayment, createStripePayment} = require("../utils/stripe");
+const clientUrl = process.env.NODE_ENV === "production" ? process.env.ONLINE_CLIENT_URL : process.env.CLIENT_URL;
+const baseUrl = process.env.NODE_ENV === "production" ? process.env.ONLINE_BASE_URL : process.env.BASE_URL;
 
-stripe.customers.list({
-    limit: 20
-}).then(customers=>{
-    //console.log(customers)
-    /*customers.data.forEach((customer) => {
-        stripe.customers.del(customer.id);
-    })*/
-})
 const validateCredentials = async(req, res)=>{
+    console.log("hi",{email: req.session.userEmail})
     if(req.session.userEmail) return res.send({message: true})
     console.log(req.body)
     const {name, email, password} = req.body;
@@ -47,6 +43,7 @@ const createPaypalOrder = async(req, res)=>{
         })
     }else{
         const user = await User.findOne({email: req.session.userEmail});
+        if (user.courses.includes(itemId) || user.subcourses.includes(itemId)) throw new AppError(1, 400, "You already bought this course!");
         paypalOrder = await PaypalOrder.create({
             customer: {
                 name: user.name,
@@ -57,6 +54,7 @@ const createPaypalOrder = async(req, res)=>{
             itemId,
             itemType
         })
+        
     }
     
     
@@ -69,15 +67,17 @@ const createPaypalOrder = async(req, res)=>{
     res.send({link, id, token})
 }
 const approvePaypalOrder = async(req, res) =>{
+    console.log("approving paypal order", req.body);
     const { orderId } = req.body;
     let order = await retrieveOrder(orderId);
     console.log({order: order.purchase_units, first: order.purchase_units[0]})
     let paypalOrder = await PaypalOrder.findById(order.purchase_units[0].custom_id);
     console.log(paypalOrder)
-    const result = await sendMail(`Confirm Paypal Payment: <a href="http://localhost:1234/capture-paypal-order/${orderId}">confirm</a>`,paypalOrder.customer.email, "Confirm Payment" )
+    const result = await sendMail(`Confirm Paypal Payment: <a href="${baseUrl}/capture-paypal-order/${orderId}">confirm</a>`,paypalOrder.customer.email, "Confirm Payment" )
     res.send({message: "We sent you an email", mail: result});
 }
 const capturePaypalOrder = async (req, res) => {
+    console.log("capturing paypal order", req.body);
     const {id} = req.params;
     const { purchase_units } = await capturePayment(id);
     let unit = purchase_units[0];
@@ -108,16 +108,7 @@ const capturePaypalOrder = async (req, res) => {
             courses,
             subcourses
         })
-        const dirPath = path.join(__dirname, "../public/users/" + user._id);
-        console.log(dirPath)
-        fs.mkdir(dirPath, (err) => {
-            if (err) {
-                console.log(err)
-                return res.status(500).send({ error: err });
-            }
-            console.log("Directory Created!")
 
-        })
         req.session.userEmail = email;
     } else {
         if (itemType === "course") {
@@ -132,94 +123,40 @@ const capturePaypalOrder = async (req, res) => {
             })
         }
     }
-    return res.redirect("http://localhost:3000");
+    return res.redirect(clientUrl);
 }
 
 const createPaymentIntent = async(req, res) =>{
-    console.log(req.body);
-    const { itemId, itemType, email, name, password, paymentMethodId } = req.body;
+    console.log("create stripe payment", req.body);
+    let { itemId, itemType, email, name, password, paymentMethodId } = req.body;
+    let user;
+    let customer;
+    if (!req.session.userEmail) password = await register(name, email, password);
+    else {
+        user = await User.findOne({ email: req.session.userEmail });
+        name = user.name;
+        email = user.email;
+        password = user.password;
+        if(user.courses.includes(itemId) || user.subcourses.includes(itemId)) throw new AppError(1, 400, "You already bought this course!");
+    }
+    if (!user || !user.stripeId) customer = await createStripeCustomer(name, email, password);
+    if(user && user.stripeId) customer = await getStripeCustomer(user.stripeId);
+
     let item;
-    if (itemType == "course") {
-        item = await Course.findById(itemId);
-    } else if (itemType == "subcourse") {
-        item = await Subcourse.findById(itemId);
-    }
-    if(!req.session.userEmail){
-        const hashedPassword = await register(name, email, password);
-        console.log(hashedPassword)
-        if (!hashedPassword) throw new AppError(1, 500, "hashedPassword: " + hashedPassword)
-        
-        const customer = await stripe.customers.create({
-            name,
-            email,
-            metadata: {
-                password: hashedPassword,
-                logged: false
-            },
-            
-        })
-        console.log(item)
-        const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
-        console.log({paymentMethod})
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: item.price,
-            currency: "eur",
-            customer: customer.id,
-            payment_method: paymentMethodId,
-            metadata: {
-                itemId,
-                itemType
-            }
-        });
-
-        sendMail(`Confirm Payment: <a href="http://localhost:1234/confirm-payment-intent?paymentIntentId=${paymentIntent.id}">confirm</a>`, email, "Confirm Payment")
-        return res.send({ message: "We sent you an email" });
-    } else{
-        console.log(req.session.userEmail)
-        const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
-        console.log({ paymentMethod })
-        let user = await User.findOne({email: req.session.userEmail});
-        let customer;
-        if(user.stripeId){
-            console.log(user.stripeId)
-            customer = await stripe.customers.update(user.stripeId, {
-                metadata: {
-                    password: user.password,
-                    logged: true
-                }
-            });
-        }else{
-            customer = await stripe.customers.create({
-                name: user.name,
-                email: user.email,
-                metadata: {
-                    password: user.password,
-                    logged: true
-                }
-            })
-            user = await User.findByIdAndUpdate(user._id, {stripeId: customer.id}, {new: true})
-        }
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: item.price,
-            currency: "eur",
-            customer: customer.id,
-            payment_method: paymentMethodId,
-            metadata: {
-                itemId,
-                itemType
-            }
-        });
-
-        sendMail(`Confirm Payment: <a href="http://localhost:1234/confirm-payment-intent/${paymentIntent.id}">confirm</a>`, user.email, "Confirm Payment")
-        return res.send({ message: "We sent you an email" });
-    }
+    if (itemType === "course") item = await Course.findById(itemId);
+    else if (itemType === "subcourse") item = await Subcourse.findById(itemId);
+    else throw new AppError(1, 404, "No item with that id");
     
+    const paymentIntent = await createStripePayment(paymentMethodId, customer.id, item.price, itemId, itemType);
+    sendMail(`Confirm Payment: <a href="${baseUrl}/confirm-payment-intent/${paymentIntent.id}">confirm</a>`, user.email, "Confirm Payment")
+    return res.send({ message: "We sent you an email" });
 }
 
 const confirmPaymentIntent = async (req, res) =>{
+    console.log("confirm stripe payment", req.params);
     const { id } = req.params;
-    const paymentIntent = await stripe.paymentIntents.retrieve(id);
-    const { id: stripeId, email, name, metadata: {password, logged}} = await stripe.customers.retrieve(paymentIntent.customer);
+    const paymentIntent = await getStripePayment(id);
+    const { id: stripeId, email, name, metadata: {password, logged}} = await getStripeCustomer(paymentIntent.customer);
     if(!password) throw new AppError(1, 500, "Passoword: " + password)
     const {itemId, itemType} = paymentIntent.metadata;
     let item;
@@ -246,16 +183,6 @@ const confirmPaymentIntent = async (req, res) =>{
             courses,
             subcourses
         })
-        const dirPath = path.join(__dirname, "../public/users/" + user._id);
-        console.log(dirPath)
-        fs.mkdir(dirPath, (err) => {
-            if (err) {
-                console.log(err)
-                return res.status(500).send({ error: err });
-            }
-            console.log("Directory Created!")
-
-        })
         req.session.userEmail = email;
     } else {
         if (itemType === "course") {
@@ -272,50 +199,12 @@ const confirmPaymentIntent = async (req, res) =>{
     }
 
     
-    const confirmedPayment = await stripe.paymentIntents.confirm(paymentIntent.id);
+    const confirmedPayment = await confirmStripePayment(id);
     console.log("confirmedpayment", confirmedPayment);
-    return res.redirect("http://localhost:3000");
+    console.log("redirecting...", clientUrl)
+    return res.redirect(clientUrl);
 }
-const stripeEvents = async(req, res) =>{
-    console.log("stripe session", req.session)
-    if(process.env.STRIPE_WEBHOOK_SECRET){
-        let signature = req.headers["stripe-signature"];
-        let event = stripe.webhooks.constructEvent(req.rawBody,signature, process.env.STRIPE_WEBHOOK_SECRET )
-        console.log({event: event.type});
-        if (event.type === "payment_intent.succeeded"){
-            
-            const paymentObject = event.data.object;
-            console.log(paymentObject)
-        }
-            /*const email = paymentObject.metadata.userEmail;
-            const itemId = paymentObject.metadata.itemId;
-            const itemType = paymentObject.metadata.itemType;
-            const user = await User.findOne({
-                email: email
-            })
-            console.log("user",user);
-            console.log("itemType",itemType);
-            let userItems = user[itemType + "s"];
-        
-            userItems.push(itemId);
-            console.log(userItems);
-            const obj = {
-                [itemType]: userItems
-            }
-            console.log(obj)
-            const newUser = await User.findOneAndUpdate({
-                email: email
-            }, {
-                [itemType +"s"]: userItems
-            }, {
-                new: true
-            })
-            console.log(newUser);
-        }*/
-    }
-    
-    res.sendStatus(200)
-}
+
 
 module.exports = {
     validateCredentials,
@@ -323,6 +212,5 @@ module.exports = {
     confirmPaymentIntent,
     capturePaypalOrder,
     approvePaypalOrder,
-    createPaypalOrder,
-    stripeEvents
+    createPaypalOrder
 }

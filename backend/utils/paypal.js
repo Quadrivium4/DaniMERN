@@ -40,7 +40,7 @@ async function createOrder(item, custom_id) {
                 break;
             }
         }
-        console.log(data, link)
+        //console.log(data, link)
         let {token} = urlModule.parse(link, true).query
         return { link, token, id};
 }
@@ -74,9 +74,9 @@ async function retrieveOrder(orderId){
 }
 // generate an access token using client id and app secret
 async function generateAccessToken() {
-    console.log(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET)
+    //console.log(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET)
     const auth = Buffer.from(PAYPAL_CLIENT_ID + ":" + PAYPAL_CLIENT_SECRET).toString("base64");
-    console.log(auth)
+    //console.log(auth)
     const response = await fetch(`${baseURL.sandbox}/v1/oauth2/token`, {
         method: "POST",
         body: "grant_type=client_credentials",
@@ -84,9 +84,9 @@ async function generateAccessToken() {
             Authorization: `Basic ${auth}`,
         },
     });
-    console.log(response)
+    //console.log(response)
     const data = await response.json();
-    console.log({data})
+    //console.log({data})
     return data.access_token;
 }
 

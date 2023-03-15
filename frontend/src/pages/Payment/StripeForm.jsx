@@ -9,7 +9,7 @@ useElements
 } from "@stripe/react-stripe-js";
 import { baseUrl } from "../../App";
 import { useUser } from "../../Context";
-import Register from "../Register";
+import Message from "../../components/Message";
 
 
 
@@ -57,7 +57,7 @@ export default function CheckoutForm({itemId, itemType, credentials}) {
         });
         if(error){
             setIsLoading(false);
-            return setMessage(error.message)
+            return setMessage({type: "error", content: error.message})
         }
         fetch(baseUrl + "/create-payment-intent", {
             method: "POST",
@@ -72,10 +72,10 @@ export default function CheckoutForm({itemId, itemType, credentials}) {
             const response = await res.json();
             throw new Error(response.message);
         }).then(async(res)=>{
-            setMessage(res.message)
+            setMessage({type: "success", content: res.message})
             console.log(res);
-        }).catch(response=>{
-            setMessage(response.message)
+        }).catch(err=>{
+            setMessage({type: "error", content: err.message})
         })
 
         setIsLoading(false);
@@ -89,11 +89,11 @@ export default function CheckoutForm({itemId, itemType, credentials}) {
         
         <button disabled={isLoading || !stripe || !elements} id="submit">
             <span id="button-text">
-            {isLoading ? <div className="spinner" id="spinner"></div> : "Pay now"}
+            {isLoading ? "Loading..." : "Pay now"}
             </span>
         </button>
         {/* Show any error or success messages */}
-        {message? <div id="payment-message">{message}</div>: null}
+        {message? <Message type={message.type}  content={message.content} toggle={()=>{setMessage(false)}}></Message>: null}
         </form>
     );
 }

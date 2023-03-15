@@ -10,6 +10,7 @@ const { User, Course} = require("./models");
 const fs = require("fs")
 const fsPromises = require("fs/promises");
 const PDFDocument = require('pdfkit');
+const { bucket } = require("./db");
 
 
 const oAuth2Client = new google.auth.OAuth2(
@@ -24,7 +25,7 @@ const tryCatch = (controller) => async (req, res, next) => {
     try {
         await controller(req, res, next);
     } catch (error) {
-        console.log("error")
+        console.log("error in try catch")
         return next(error)
     }
 }
@@ -136,7 +137,7 @@ async function saveFile(file, savePath){
     return fileName;
 
 }
-function createPdfReview(pathName, title, username, img, fields, priceRange, comment) {
+function createPdfReview(name, title, username, img, fields, priceRange, comment) {
     const colors = {
         dark: "#000014",
         medium: "#0F1437",
@@ -144,7 +145,7 @@ function createPdfReview(pathName, title, username, img, fields, priceRange, com
     }
     const doc = new PDFDocument;
     let curPosY = 0;
-    doc.pipe(fs.createWriteStream(`${pathName}.pdf`));
+    const {id} = doc.pipe(bucket.actions.openUploadStream(name + ".pdf"));
 
     // BACKGROUND
     let grad = doc.linearGradient(0, 0, 0, doc.page.height)
@@ -262,6 +263,7 @@ function createPdfReview(pathName, title, username, img, fields, priceRange, com
             width: 110,
         })
     doc.end()
+    return id;
 }
 
 

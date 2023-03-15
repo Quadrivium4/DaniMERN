@@ -10,7 +10,7 @@ const fileUpload = require("express-fileupload");
 
 const app = express();
 const port = 1234;
-const connectDB = require("./db")
+const {connectDB} = require("./db")
 const {publicRouter, protectedRouter} = require("./routes");
 const errorHandler = require("./middlewares/errorHandler");
 
@@ -45,15 +45,14 @@ app.use("/assets", express.static("./public"))
 app.use(session({
     secret: process.env.SECRET,
     cookie: {
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
         httpOnly: true,
-        sameSite: "none"
+        sameSite: process.env.NODE_ENV === "production"? "none": "lax"
     },
     
     resave: false,
     saveUninitialized: false,
-    proxy: true,
     store: MongoStore.create({
         mongoUrl: process.env.MONGO_URI,
         dbName: "Store"
@@ -73,4 +72,5 @@ const main = async () => {
     }
 }
 app.use(errorHandler)
+app.use("/protected", errorHandler)
 main();

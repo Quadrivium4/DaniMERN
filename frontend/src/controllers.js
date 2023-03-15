@@ -16,6 +16,9 @@ const register = async(name, email, password)=> {
             password
         })
 }
+const getFile = (id) =>{
+    return (baseUrl + "/files/" + id);
+}
 const logout = async() => {
     return await crossing(protectedUrl + "/logout");
 }
@@ -55,5 +58,6 @@ export {
     getSubcourses,
     getReviews,
     deleteReview,
-    deleteUser
+    deleteUser,
+    getFile
 }

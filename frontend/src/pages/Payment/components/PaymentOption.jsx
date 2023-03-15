@@ -1,7 +1,7 @@
 import { useUser } from "../../../Context";
 const PaymentOption = ({img, setPaymentType, currentPaymentType, paymentType, name, isSubmitted, setMessage})=>{
     const {isLogged} = useUser();
-    console.log({paymentType, currentPaymentType})
+    console.log({paymentType, currentPaymentType, isSubmitted, isLogged})
     let backgroundColor = paymentType === currentPaymentType ?"rgb(15,20,55)": null;
     const handleClick = () =>{
         console.log(isSubmitted)
