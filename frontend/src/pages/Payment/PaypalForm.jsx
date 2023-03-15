@@ -1,12 +1,13 @@
 import {PayPalButtons} from "@paypal/react-paypal-js";
-import { useEffect } from "react";
+import { useState } from "react";
 import { baseUrl } from "../../App";
-const PaypalForm = ({itemId, itemType, credentials, setMessage}) =>{
-
+import Message from "../../components/Message";
+const PaypalForm = ({itemId, itemType, credentials}) =>{
+    const [message, setMessage] = useState();
     const createOrder = async(data, actions)=>{
         console.log({credentials}, this)
         let url = baseUrl+"/create-paypal-order";
-        const {id, link} = await fetch(url, {
+        const res = await fetch(url, {
             method: "POST",
             credentials: "include",
             //withCredentials: true,
@@ -14,9 +15,14 @@ const PaypalForm = ({itemId, itemType, credentials, setMessage}) =>{
                 "Content-type": "application/json"
             },
             body: JSON.stringify({itemId, itemType, ...credentials})
-        }).then(res => res.json());
+        }).then(res => res.json()).catch(err=>{
+            console.log("hi jfkdlsa;fjkdslf;dsjfklds;")
+            setMessage({content: err.message, type: "error"})
+        })
         //window.location.assign(link);
-        if(!id) new Error('Cannot create order')
+        console.log(res)
+        const {id, link} = res;
+        if(!id) throw new Error(res.message)
         return id
     }
     const onApprove = async(data, actions) =>{
@@ -34,17 +40,21 @@ const PaypalForm = ({itemId, itemType, credentials, setMessage}) =>{
           .then((response) => response.json())
           .then((data) => {
                 setMessage({content: data.message, type: "success"})
-          });
+          }).catch(err=>{
+            setMessage({content: err.message, type: "error"})
+          })
     }
     const onError = (err) =>{
         console.log({err})
-        setMessage({content: "An Error Occurred", type: "error"})
+        setMessage({content:err.message, type: "error"})
     }
     const onCancel =  (data)=>{
         console.log("order canceled", {data})
         setMessage({content: "Order Canceled", type: "error"})
     }
-    return (<div id="paypal-button">
+    return (
+        <>
+    <div id="paypal-button">
     <PayPalButtons
             forceReRender={[credentials]} 
             style={{
@@ -54,13 +64,15 @@ const PaypalForm = ({itemId, itemType, credentials, setMessage}) =>{
             onInit={(data, actions)=>{
                 console.log("init")
             }}
+            
             createOrder={createOrder}
             onApprove={onApprove}
             onError={onError}
             onCancel={onCancel}
             ></PayPalButtons>
     </div>
-        
+    {message? <Message type={message.type} content={message.content} toggle={()=>{setMessage(null)}}></Message>: null}
+        </>
     )
 }
 export default PaypalForm;

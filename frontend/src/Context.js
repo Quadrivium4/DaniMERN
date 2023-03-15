@@ -34,7 +34,7 @@ const userReducer = (state, action) =>{
             return { ...state, isLogged: action.value, loading: false };
         case "RESET": 
             localStorage.setItem("isLogged", false);
-            return initialState;
+            return {initialState, loading: false};
         default: return state
     }
 

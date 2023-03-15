@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef} from "react"
 import { Link, useNavigate } from "react-router-dom";
 import { useUser, useUserDispatch } from "../../Context";
-import { logout, getCourses, getSubcourses, getReviews, deleteReview, deleteUser } from "../../controllers";
+import { logout, getCourses, getSubcourses, getReviews, deleteReview, deleteUser, getFile } from "../../controllers";
 import { assetsUrl, baseUrl, protectedUrl } from "../../App";
 import FileUpload from "../../components/FileUpload/FileUpload";
 import ProgressBar from "../../components/ProgressBar/ProgressBar";
@@ -56,9 +56,9 @@ const Dashboard = () => {
             credentials: "include",
             method: 'POST',
             body: formData,
-        }).then((res) => res.json()).then(({fileName})=>{
-            console.log(fileName)
-            const newUser = {...info, profileImg: fileName};
+        }).then((res) => res.json()).then(({fileId})=>{
+            console.log(fileId)
+            const newUser = {...info, profileImg: fileId};
             dispatch({type: "SET_INFO", value: newUser});
         })
     }
@@ -112,12 +112,12 @@ const Dashboard = () => {
                             <ProgressBar 
                             progress={videoUploadProgress} 
                             total={videoUploadTotal} 
-                            containerStyle={{position: 'absolute', background: "rgb(33, 50, 100)", display: videoUploadTotal ? "block" : "none"}} 
+                            containerStyle={{position: 'absolute', left: 0, top: 0, background: "rgb(33, 50, 100)", display: videoUploadTotal ? "block" : "none"}} 
                             barStyle={{background: "rgb(15, 20, 55)"}}/>
                             <div className="layer" style={ {backgroundColor: video === false? "rgb(255, 141, 141)": "transparent"}}></div>
                             <img ref={videoPreview} src={uploadIcon} alt="upload icon" style={{}/* {width: video ? "100%": "150px"}*/} ></img>
                         </FileUpload>
-                        <button onClick={uploadVideo}>Carica</button>
+                        <button onClick={uploadVideo}>Invia</button>
                     </div>
                     <div className="description">
                         <h2>Descrizione</h2>
@@ -162,7 +162,7 @@ const Dashboard = () => {
                     <FileUpload setFile={uploadImage} imgPreview={profileImgPreview} >
                         {
                             info.profileImg?
-                            <img ref={profileImgPreview} src={assetsUrl + "/" + info._id +"/"+ info.profileImg} alt="profile img"></img> :
+                            <img ref={profileImgPreview} src={getFile(info.profileImg)} alt="profile img"></img> :
                             <img ref={profileImgPreview} src={accountImg} alt="profile img"></img>
                         }
                     </FileUpload>
@@ -206,12 +206,12 @@ const Dashboard = () => {
                 <div className="scroller-wrap">
                     <div className="scroller">
                         {status === "loading"? <p>loading</p> : courses?.map(course=>{
-                            let image = baseUrl + "/assets/images/" + course.coverImg;
+                            
                             return (
                                 <Link to="/view" state={{type: "course", id: course._id }} key={course._id}>
                                     <div className="course" >
-                                        <img src={image} alt="" />
-                                        <p className="title">{course.name}</p>
+                                        <img src={getFile(course.coverImg)} alt="" />
+                                        <h3 className="title">{course.name}</h3>
                                     </div>
                                 </Link>
                             )
@@ -222,21 +222,21 @@ const Dashboard = () => {
                 <div className="scroller-wrap">
                     <div className="scroller">
                         {status === "loading"? <p>loading</p> : subcourses?.map(subcourse=>{
-                            let image = baseUrl+ "/assets/images/" + subcourse.coverImg;
                             return (
                                 <Link to="/view" state={{type: "subcourse", id: subcourse._id }} key={subcourse._id}>
                                     <div className="subcourse" >
-                                        <img src={image} alt="" />
-                                        <p className="title">{subcourse.name}</p>
+                                        <img src={getFile(subcourse.coverImg)} alt="" />
+                                        <h3 className="title">{subcourse.name}</h3>
                                     </div>
                                 </Link>
                             )
                         })}
                     </div>
                 </div>
-                <Link to="/store">New Course</Link>
-                    </div>
-
+                <Link to="/store">
+                    <button>New Course</button>
+                </Link>
+            </div>
         </div>
     )
 }

@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const { User, Review} = require("../models");
 const {download, createPdfReview, getNewFileName, deleteWistiaVideo} = require("../utils");
+const { deleteFile } = require('../utils/files');
 const getReviews = async(req, res) =>{
     const user = req.user;
     let reviews;
@@ -23,14 +24,8 @@ const deleteReview = async(req, res) =>{
     if(user.reviews.includes(id)){
         deletedReview = await Review.findByIdAndDelete(id);
         const newUserReviews = user.reviews.filter(review => review !== id);
-        const pdfPath = path.join(__dirname, "../public/users/" + user._id, deletedReview.pdf)
-        fs.unlink(pdfPath, (err)=>{
-            if(err) {
-                console.log({err})
-                return res.status(500).send({err});
-            }
-            console.log("file successfully deleted");
-        })
+        if (deleteReview.pdf) await deleteFile(deletedReview.pdf)
+        
         User.findByIdAndUpdate(user._id, {
             reviews: newUserReviews
         })
@@ -51,13 +46,11 @@ const postReview = async (req, res) => {
     if (!user.role === "admin") return res.status(401).send({ ok: false, message: "not allowed" });
     const image = await download(review.video.previewImg);
     const videoName = path.parse(path.basename(review.video.name)).name;
-    const pdfFileName = getNewFileName(videoName)
-    const pathName = path.join(__dirname, "../public/users/"+ reviewedUser._id + "/"+ pdfFileName);
-    createPdfReview(pathName,videoName, reviewedUser.name, image, fields, priceRange, comment);
-
+    const pdfId = await createPdfReview(videoName,videoName, reviewedUser.name, image, fields, priceRange, comment);
+    console.log("pdf result", {pdfId})
     const updatedReview = await Review.findByIdAndUpdate(id,{
         completed: true,
-        pdf: pdfFileName + ".pdf"
+        pdf: pdfId
     }, {
         new: true
     })

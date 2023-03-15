@@ -1,3 +1,4 @@
+@import "../../root.css";
 #product {
     width: 100%;
     display: flex;
@@ -8,7 +9,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-
+    
+}
+#product .course h1{
+    background: var(--dark);
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+    text-align: center;
 }
 #product .course img{
     width: 100%
@@ -19,11 +27,18 @@
 #product .subcourses {
     display: flex;
     width: 100%;
+    gap: 1px;
+
 }
 #product .subcourse{
     width: 50%;
     display: flex;
     flex-direction: column;
+}
+#product .subcourse h2{
+    text-align: center;
+    padding: 10px;
+    background: var(--dark);
 }
 #product .price{
     width: 100%;

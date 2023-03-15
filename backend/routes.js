@@ -10,6 +10,12 @@ const {confirmPaymentIntent,createPaymentIntent, stripeEvents, createPaypalOrder
 const { tryCatch } = require("./utils");
 const { verifyUser} = require("./middlewares/verifyUser");
 const { errorHandler} = require("./middlewares/errorHandler");
+const {downloadFile} = require("./utils/files");
+
+
+
+
+publicRouter.get("/files/:id", tryCatch(downloadFile))
 
 console.log(verifyUser)
 protectedRouter.use(tryCatch(verifyUser));

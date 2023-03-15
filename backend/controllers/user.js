@@ -5,7 +5,9 @@ const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
 const SALT_ROUNDS = 10;
-const { validateEmail, sendMail, getNewFileName, deleteFile, uploadWistiaVideo, saveFile, tryCatch } = require("../utils");
+const { validateEmail, sendMail, getNewFileName, uploadWistiaVideo} = require("../utils");
+const {deleteFile, getFile, saveFile} = require("../utils/files");
+const {deleteCustomer} = require("../utils/stripe");
 
 const login = async (req, res) => {
     console.log(req.body)
@@ -50,17 +52,15 @@ const login = async (req, res) => {
 const uploadUserImg = async(req, res) =>{
     const user = req.user;
     const email = user.email;
-    const fileName = await saveFile(req.files.file, path.join(__dirname, "../public", "users", `${user._id}`))
+    const fileId = await saveFile(req.files.file)
     const newUser = await User.findOneAndUpdate({ email }, {
-        profileImg: fileName
+        profileImg: fileId
     }, {
         new: true
     });
-    if (user.profileImg) {
-        deleteFile(path.join("public", "users", `${user._id}`, user.profileImg));
-    }
+    if (user.profileImg) await deleteFile(user.profileImg);
     console.log(newUser);
-    res.send({fileName})
+    res.send({fileId})
 }
 const uploadUserVideo = async (req, res) => {
     const email = req.session.userEmail;
@@ -155,7 +155,7 @@ const getUser = async (req, res) => {
 const registerConfirmation = async (req, res) => {
     const { userId, token } = req.params;
     const user = await UnverifiedUser.findOne({ _id: userId });
-    console.log(user, userId, token)
+    console.log({user, userId, token})
     if (!user) return res.status(400).send({ ok: false, message: "invalid link" });
     const unverifiedUser = await UnverifiedUser.findOne({
         _id: userId,
@@ -167,16 +167,7 @@ const registerConfirmation = async (req, res) => {
             email: unverifiedUser.email,
             password: unverifiedUser.password
         });
-        const dirPath = path.join(__dirname, "../public/users/" + verifiedUser._id);
-        console.log(dirPath)
-        fs.mkdir(dirPath, (err)=>{
-            if(err) {
-                console.log(err)
-                return res.status(500).send({error: err});
-            }
-            console.log("Directory Created!")
-
-        })
+        
         const deletedUser = await UnverifiedUser.findOneAndDelete({
             _id: unverifiedUser._id
         })
@@ -247,14 +238,13 @@ const logout = (req, res) => {
 const deleteUser = async(req, res) =>{
     const user = req.user;
     const deletedUser = await User.findByIdAndDelete(user._id);
-    fs.rm(path.join(__dirname, "../public/users/" + user._id),{recursive: true}, (err)=>{
-        if(err){
-            console.log(err)
-            throw new AppError(1, 500, "Cannot delete directory");
-        }
-        console.log('directory deleted')
-    });
+    const reviews = await Review.find({ _id: { $in: user.reviews } })
+    reviews.forEach(review=>{
+        deleteFile(review.pdf)
+    })
     const deletedReviews = await Review.deleteMany({ _id: { $in: user.reviews } });
+    const deletedCustomer = await deleteCustomer(user.stripeId);
+
     req.session.destroy(err => {
         if (err) {
             return res.send({

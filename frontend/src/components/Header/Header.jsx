@@ -8,6 +8,8 @@ import headerImg from "../../assets/images/header.jpg";
 import logoImg from "../../assets/images/logo.png";
 import "./Header.css";
 import { useUser, useUserDispatch } from "../../Context";
+import { getFile } from "../../controllers";
+import AdminIcon from "../../assets/images/admin.png"
 
 const Header = () => {
     const {isLogged, info} = useUser();
@@ -35,12 +37,12 @@ const Header = () => {
             {isLogged? 
                     <Link to="/dashboard">
                         {info?.profileImg ? 
-                            <img alt="account-img" className="account-img" src={info.role === "admin"? "http://localhost:1234/assets/images/icon.png" :"http://localhost:1234/assets/users/"+info._id +"/"+info.profileImg} />
+                            <img alt="account-img" className="account-img" src={info.role === "admin"? AdminIcon: getFile(info.profileImg)} />
                             :
                             <img alt="account-img" className="account-img" src={accountImg} />
                         }
                     </Link> : 
-                    <img onClick={handleLoginPop} alt="account-img" className="account-img" src={accountImg} />
+                    <img onClick={handleLoginPop} alt="account-img" className="account-img" src={ accountImg} />
                     }
             {loginPop? 
                 <Pop toggle={handleLoginPop}>

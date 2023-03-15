@@ -20,7 +20,7 @@
     transition: all 0.2s ease-in-out;
 }
 #header .logo-img:hover{
-    width: 10.5vw;
+    transform: scale(1.1);
 }
 #header .user-head{
     display: flex;

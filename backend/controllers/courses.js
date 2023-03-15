@@ -1,5 +1,6 @@
 const { User, Course, Subcourse} = require("../models");
-const {requestCourseData, getNewFileName,deleteFile, saveFile} = require("../utils");
+const {requestCourseData} = require("../utils");
+const { deleteFile, saveFile } = require("../utils/files");
 const path = require("path");
 const fs = require("fs");
 const { UNAUTHORIZED, RESOURCE_NOT_FOUND } = require("../constants/errorCodes");
@@ -110,13 +111,13 @@ const postCourse = async (req, res) => {
     subcourses = JSON.parse(subcourses);
     let user = req.user;
     if (user.role == "admin") {
-        let coverImgName = await saveFile(req.files.coverImg, path.join("public", "images"));
+        let fileId = await saveFile(req.files.coverImg);
         Course.create({
             name,
             description,
             price,
             subcourses,
-            coverImg: coverImgName
+            coverImg: fileId
         })
     };
 }
@@ -125,15 +126,15 @@ const putCourse = async (req, res) => {
     subcourses = JSON.parse(subcourses);
     let user = req.user;
     if (user.role == "admin") {
-        let coverImgName = await saveFile(req.files.coverImg, path.join("public", "images"))
+        let fileId = await saveFile(req.files.coverImg)
         let oldCourse = await Course.findOneAndUpdate({_id: id},{
             name,
             description,
             price,
             subcourses,
-            coverImg: coverImgName
+            coverImg: fileId
         });
-        deleteFile(path.join("public", "images", oldCourse.coverImg))
+        if(oldCourse.coverImg) await deleteFile(oldCourse.coverImg)
         console.log("old course:", oldCourse);
     };
 }
@@ -142,29 +143,9 @@ const deleteCourse = async (req, res) => {
     let user = req.user;
     if (user.role == "admin") {
         let deletedCourse = await Course.findOneAndDelete({ _id: id });
+        await deleteFile(deletedCourse.coverImg);
         console.log("deleted course:", deletedCourse);
     };
-}
-const testUpload = async (req, res) => {
-    console.log(req.files);
-    console.log(req.body)
-    //const { name, description, price, subcourses, id, coverImg } = req.body;
-    //const coverImg = req.files.img;
-    /*console.log("coverImg", coverImg)
-    const coverImgName = getNewFileName(coverImg.name);
-    const filePath = path.join("public", "images", coverImgName);
-    let user = await User.findOne({
-        email: req.session.userEmail
-    });
-    if (user) {
-        console.log({ filePath, coverImgName, coverImg })
-
-            file.mv(filePath, err => {
-                if (err) return res.status(500).send(err);
-                res.send({ coverImgName });
-            })
-        };*/
-    res.send({ok: true});
 }
 
 module.exports = {
@@ -174,6 +155,5 @@ module.exports = {
     postCourse,
     putCourse,
     getStore,
-    deleteCourse,
-    testUpload
+    deleteCourse
 }

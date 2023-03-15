@@ -1,5 +1,6 @@
 const { Subcourse} = require("../models");
-const { requestCourseData, getNewFileName, deleteFile, saveFile} = require("../utils");
+const { requestCourseData, } = require("../utils");
+const { deleteFile, saveFile } = require("../utils/files");
 const path = require("path");
 const { UNAUTHORIZED, RESOURCE_NOT_FOUND } = require("../constants/errorCodes");
 
@@ -40,50 +41,46 @@ const getSubcourses = async (req, res) => {
 }
 const postSubcourse = async (req, res) => {
     const { name, description, price, hashedId } = req.body;
-    let user = req.user
-    if (user.role == "admin") {
-        const coverImgName = await saveFile(req.files.coverImg, path.join(__dirname, "../public", "images"));
-        Subcourse.create({
-            name,
-            description,
-            price,
-            hashedId,
-            coverImg: coverImgName
-        })
-        res.send({message: "subcourse created"})
-    }
-
+    let user = req.user;
+    if (user.role !== "admin") throw new AppError(1, 403, "You are not an admin");
+    const fileId = await saveFile(req.files.coverImg);
+    Subcourse.create({
+        name,
+        description,
+        price,
+        hashedId,
+        coverImg: fileId
+    })
+    res.send({message: "subcourse created"})
 }
+
 const putSubcourse = async (req, res) => {
     console.log("body",req.body);
     console.log("files", req.files);
     const { name, description, price, hashedId, id } = req.body;
 
     let user = req.user;
-    if (user.role == "admin") {
-        
-        const coverImgName = await saveFile(req.files.coverImg, path.join(__dirname, "../public", "images"));
-        let oldSubcourse = await Subcourse.findOneAndUpdate({_id: id},{
-            name,
-            description,
-            price,
-            hashedId,
-            coverImg: coverImgName
-        })
-        if(oldSubcourse.coverImg){
-            deleteFile(path.join("public", "images", oldSubcourse.coverImg))
-        }
-        
-        console.log("old subcourse:", oldSubcourse);
-    }
+    if(user.role !== "admin") throw new AppError(1, 403, "You are not an admin");
+
+    const fileId = await saveFile(req.files.coverImg);
+    let oldSubcourse = await Subcourse.findOneAndUpdate({_id: id},{
+        name,
+        description,
+        price,
+        hashedId,
+        coverImg: fileId
+    })
+    if(oldSubcourse.coverImg) await deleteFile(oldSubcourse.coverImg);
+    
+    console.log("old subcourse:", oldSubcourse);
 }
 const deleteSubcourse = async (req, res) => {
     const { id } = req.params;
     let user = req.user;
-    if (user.role == "admin") {
-        let deletedSubcourse = await Subcourse.findOneAndDelete({ _id: id });
-        console.log("deleted course:", deletedSubcourse);
-    };
+    if (user.role !== "admin") throw new AppError(1, 403, "You are not an admin");
+    let deletedSubcourse = await Subcourse.findOneAndDelete({ _id: id });
+    await deleteFile(deletedSubcourse.coverImg)
+    console.log("deleted course:", deletedSubcourse);
 }
 
 module.exports = {
