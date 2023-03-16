@@ -32,7 +32,7 @@ const Store = () => {
                         <div key={course.id} className="product">
                             <Link to={"/product"} state={course}>
                                 <img className="course-img" alt="course-img" src={getFile(course.coverImg)} />
-                                <h2 className="title">{course.name}</h2>
+                                <h2>{course.name}</h2>
                                 <h2 id="price">€{(course.price/100).toFixed(2)}</h2>
                                 <div id="layer"></div>
                             </Link>

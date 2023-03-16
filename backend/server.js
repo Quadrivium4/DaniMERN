@@ -16,7 +16,6 @@ const errorHandler = require("./middlewares/errorHandler");
 const IS_PRODUCTION = process.env.NODE_ENV === "production"? true: false;
 
 
-
 app.use(bodyParser.json({
     verify: function (req, res, buf, encoding) {
 
@@ -66,7 +65,7 @@ const main = async () => {
     try {
         await connectDB(process.env.MONGO_URI);
         app.listen(port, () => {
-            console.log(`Server is listening on port ${port}`);
+            console.log(`Server is listening on port ${port}`, "is production: " + IS_PRODUCTION);
         })
     } catch (err) {
         console.log(err);
