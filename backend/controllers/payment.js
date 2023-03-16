@@ -148,7 +148,7 @@ const createPaymentIntent = async(req, res) =>{
     else throw new AppError(1, 404, "No item with that id");
     
     const paymentIntent = await createStripePayment(paymentMethodId, customer.id, item.price, itemId, itemType);
-    sendMail(`Confirm Payment: <a href="${baseUrl}/confirm-payment-intent/${paymentIntent.id}">confirm</a>`, user.email, "Confirm Payment")
+    sendMail(`Confirm Payment: <a href="${baseUrl}/confirm-payment-intent/${paymentIntent.id}">confirm</a>`, email, "Confirm Payment")
     return res.send({ message: "We sent you an email" });
 }
 
