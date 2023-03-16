@@ -13,6 +13,7 @@ const port = 1234;
 const {connectDB} = require("./db")
 const {publicRouter, protectedRouter} = require("./routes");
 const errorHandler = require("./middlewares/errorHandler");
+const IS_PRODUCTION = process.env.NODE_ENV === "production"? true: false;
 
 
 
@@ -45,12 +46,12 @@ app.use("/assets", express.static("./public"))
 app.use(session({
     secret: process.env.SECRET,
     cookie: {
-        secure: process.env.NODE_ENV === "production",
+        secure: IS_PRODUCTION,
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === "production"? "none": "lax"
+        sameSite: IS_PRODUCTION? "none": "lax"
     },
-    
+    proxy: IS_PRODUCTION,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
