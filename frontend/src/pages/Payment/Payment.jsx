@@ -152,9 +152,9 @@ function Payment(){
                 <>
                 <PayPalScriptProvider options={{"client-id": "AdP17URr89DbDrFV6yo1WEHC1F0lf900hz8oqXaH2I8_BMgmu5ZIukifi328vMSQurAbAuSCY_OqQjbT", currency: "EUR"}}>
                     <Elements stripe={stripePromise}>
-                    {stripePromise && paymentType === "credit-card" && isSubmitted? (
+                    {stripePromise && paymentType === "credit-card" && (isSubmitted || isLogged)? (
                         <StripeForm itemId={item.id} itemType={item.subcourses? "course": "subcourse"} credentials={credentials}/>
-                    ) : paymentType === "paypal" && isSubmitted?
+                    ) : paymentType === "paypal" && (isSubmitted || isLogged) ?
                         <PaypalForm  itemId={item.id} itemType={item.subcourses? "course": "subcourse"} credentials={credentials} />
                     : null
                     }
