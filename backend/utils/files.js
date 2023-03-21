@@ -37,7 +37,6 @@ const deleteFile = async(id) =>{
         console.log({err})
         //throw new AppError(1, 404, err.message)
     }
-
     console.log(stream)
     return stream;
 }

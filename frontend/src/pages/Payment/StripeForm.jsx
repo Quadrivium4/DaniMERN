@@ -10,6 +10,7 @@ useElements
 import { baseUrl } from "../../App";
 import { useUser } from "../../Context";
 import Message from "../../components/Message";
+import { crossing } from "../../utils";
 
 
 
@@ -37,14 +38,10 @@ const appearance = {
 export default function CheckoutForm({itemId, itemType, credentials}) {
     const stripe = useStripe();
     const elements = useElements();
-    const {isLogged} = useUser()
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [name, setName] = useState('');
     const [message, setMessage] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
-
+    console.log("creating card")
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!stripe || !elements) return;
@@ -59,6 +56,7 @@ export default function CheckoutForm({itemId, itemType, credentials}) {
             setIsLoading(false);
             return setMessage({type: "error", content: error.message})
         }
+
         fetch(baseUrl + "/create-payment-intent", {
             method: "POST",
             withCredentials: true,
@@ -84,7 +82,7 @@ export default function CheckoutForm({itemId, itemType, credentials}) {
     return (
         <form id="stripe-form" onSubmit={handleSubmit}>
             <div id="card-element" >
-                <CardElement id="payment-element" options={appearance} />
+                {/*<CardElement id="payment-element" options={appearance} />*/}
             </div>
         
         <button disabled={isLoading || !stripe || !elements} id="submit">

@@ -17,7 +17,7 @@ const initialState = {
 
 const userReducer = (state, action) =>{
     //console.log("state:", state, "action:", action)
-    console.log(state)
+    console.log(action)
     switch(action.type){
         case "SET_INFO": 
             return {...state, info: action.value};
@@ -32,6 +32,8 @@ const userReducer = (state, action) =>{
         case "SET_LOGGED": 
             localStorage.setItem("isLogged", action.value);
             return { ...state, isLogged: action.value, loading: false };
+        case "SET_LOADING":
+            return { ...state,  loading: false };
         case "RESET": 
             localStorage.setItem("isLogged", false);
             return {initialState, loading: false};
@@ -42,24 +44,29 @@ const userReducer = (state, action) =>{
 
 export const Context = ({children}) =>{
     const [state, dispatch] = useReducer(userReducer, initialState);
-    const {isLogged } = state;
+    const isLoggedLocal = JSON.parse(localStorage.getItem("isLogged"));
+    const {isLogged} = state;
     useEffect(() => {
-        if (!isLogged) {
-                const fetchData = async () => {
-                    let data = await getUser();
-                    console.log(data)
-                    if (data.ok) {
-                        
-                        dispatch({ type: "SET_INFO", value: data.user });
-                        dispatch({ type: "SET_COURSES", value: data.courses });
-                        dispatch({ type: "SET_SUBCOURSES", value: data.subcourses })
-                        dispatch({ type: "SET_LOGGED", value: true });
-                        return;
-                    }
-                    dispatch({ type: "SET_LOGGED", value: false });
+        console.log({isLoggedLocal, isLogged})
+        if (!isLoggedLocal && !isLogged) dispatch({ type: "SET_LOADING", value: false })
+        else {
+            console.log("i'm fetching state")
+            const fetchData = async () => {
+                let data = await getUser();
+                console.log(data)
+                if (data.ok) {
+
+                    dispatch({ type: "SET_INFO", value: data.user });
+                    dispatch({ type: "SET_COURSES", value: data.courses });
+                    dispatch({ type: "SET_SUBCOURSES", value: data.subcourses })
+                    dispatch({ type: "SET_LOGGED", value: true });
+                    return;
                 }
-                fetchData()
+                dispatch({ type: "SET_LOGGED", value: false });
+            }
+            fetchData()
         }
+
     }, [])
 
     return (
