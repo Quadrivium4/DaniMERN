@@ -11,7 +11,7 @@ import Review from "./Review/Review";
 
 const Pages = () =>{
     const {isLogged, info }= useUser();
-    console.log(isLogged)
+    console.log("Pages: ",{isLogged})
     return(
         <Routes>
             <Route path="/" element={isLogged? <Navigate to="/dashboard" /> : <Store />}></Route>

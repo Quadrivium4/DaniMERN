@@ -9,7 +9,7 @@ const crypto  = require("crypto");
 const fileUpload = require("express-fileupload");
 
 const app = express();
-const port = 1234;
+const port = process.env.PORT || 1234;
 const {connectDB} = require("./db")
 const {publicRouter, protectedRouter} = require("./routes");
 const errorHandler = require("./middlewares/errorHandler");

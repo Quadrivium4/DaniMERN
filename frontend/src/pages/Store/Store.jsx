@@ -36,11 +36,14 @@ const Store = () => {
                                 <h2 id="price">€{(course.price/100).toFixed(2)}</h2>
                                 <div id="layer"></div>
                             </Link>
+                            
                         </div>
                         
                         )
                 }): <p>loading</p>}
+                
             </div>
+            {store? <img src="https://res.cloudinary.com/dkbe7c8we/image/upload/v1679289542/olympic_flag.jpg" alt="" />: <p>loading 2</p>}
         </div>
     )
 }

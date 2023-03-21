@@ -13,18 +13,12 @@ import AdminIcon from "../../assets/images/admin.png"
 
 const Header = () => {
     const {isLogged, info} = useUser();
-    console.log(info)
+    console.log("header", {info})
     const [loginPop, setLoginPop] = useState(false);
-    const [registerPop, setRegisterPop] = useState(false);
     const handleLoginPop = () => {
         setLoginPop(!loginPop);
     }
-    useEffect(()=>{
-        console.log("user");
-    },[info])
-    const handleRegisterPop = () => {
-        setRegisterPop(!registerPop);
-    }
+
     return (
         <div id="header">
             <img alt="header-img" className="header-img" src={headerImg} />
