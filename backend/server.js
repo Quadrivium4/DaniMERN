@@ -74,3 +74,4 @@ const main = async () => {
 app.use(errorHandler)
 app.use("/protected", errorHandler)
 main();
+module.exports = app;
