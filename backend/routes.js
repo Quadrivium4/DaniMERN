@@ -11,6 +11,7 @@ const { tryCatch } = require("./utils");
 const { verifyUser} = require("./middlewares/verifyUser");
 const { errorHandler} = require("./middlewares/errorHandler");
 const {downloadFile} = require("./utils/files");
+const {createDiscount} = require("./controllers/discounts")
 
 
 

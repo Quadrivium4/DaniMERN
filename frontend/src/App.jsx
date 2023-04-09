@@ -7,8 +7,8 @@ import "./App.css"
 
 export const baseUrl =  process.env.NODE_ENV === "production" ? 
                 process.env.REACT_APP_ONLINE_SERVER_URL : 
-                process.env.REACT_APP_ONLINE_SERVER_URL;
-                //process.env.REACT_APP_LOCAL_SERVER_URL;
+                //process.env.REACT_APP_ONLINE_SERVER_URL;
+                process.env.REACT_APP_LOCAL_SERVER_URL;
 export const protectedUrl =  baseUrl + "/protected";
 export const assetsUrl = baseUrl + "/assets/users";
 console.log(baseUrl, protectedUrl)

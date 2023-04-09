@@ -47,7 +47,7 @@ h1 {
     font-size: 40px;
     margin-bottom: 10px;
 }
-a, label{
+a{
     display: contents;
 }
 button {
@@ -98,11 +98,7 @@ input:disabled{
     background: rgb(78, 78, 94);
     color: rgb(161, 161, 161);
 }
-input[type="checkbox"]{
-    all: unset;
-    background: red;
-    color: black;
-}
+
 
 #root {
     display: flex;

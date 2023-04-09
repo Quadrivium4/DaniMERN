@@ -29,9 +29,10 @@ const deleteReview = async(req, res) =>{
         User.findByIdAndUpdate(user._id, {
             reviews: newUserReviews
         })
-
     }
+    await deleteWistiaVideo(deletedReview.video.hashedId);
     console.log({deletedReview});
+    res.send({message: "Review deleted succesfully"});
 }
 const putReview = async (req, res) => {a
     console.log("put")

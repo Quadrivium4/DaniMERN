@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { useUser, useUserDispatch } from "../../Context";
 import Pop from "../../components/Pop";
 import {
-    
     postCourse,
     postSubcourse,
     updateCourse,
@@ -16,6 +15,8 @@ import "./Admin.css"
 import FileUpload from "../../components/FileUpload/FileUpload";
 import { downloadFile } from "../../utils";
 import { baseUrl } from "../../App";
+import Scroller from "../../components/Scroller/Scroller";
+import Checkbox from "../../components/Checkbox/Checkbox";
 
 const Admin= () => {
     const navigate = useNavigate();
@@ -54,10 +55,11 @@ const Admin= () => {
     return (
         <div id="admin" className="page">
             {popContent? <Pop toggle={()=>{setPopContent(null)}}>{popContent}</Pop>: null}
-            <div id="reviews">
+            <section id="reviews">
                 <h1>Reviews</h1>
-                <div className="container">
-                    {reviews? reviews.map(review=>{
+                <Scroller>
+                    <div className="container">
+                        {reviews? reviews.map(review=>{
                     return (
                         <Link to={review.completed ? "/dashboard" : "/review"} state={review} key={review.video.hashedId}>
                             <div className="review">
@@ -69,24 +71,22 @@ const Admin= () => {
                         
                     )
                     }): null}
-                </div>
-                
-            </div>
-            <div id="products">
-                <div id="courses">
-                    <h1>Corsi</h1>
+                    </div>
+                </Scroller>
+            </section>
+            <section id="courses">
+                <h1>Corsi</h1>
+                <Scroller>
                     {courses?.map(course=>{
-                    
                     return (
                         <div className="course product" key={course._id}>
                             <div className="cover">
                                 <img src={getFile(course.coverImg)} alt="course-img" className="course-img" />
-                                <p>{course.name}</p>
+                                <p className="title">{course.name}</p>
                             </div>
-                            
-                            
                             <div className="actions">
-                                <Link to="/view" state={{type: "course", id: course._id }}>Go</Link>
+                                <Link to="/view" state={{type: "course", id: course._id }}>
+                                    <button>Go</button></Link>
                                 <button onClick={()=>{
                                     setPopContent(<EditCourse course={course} subcourses={subcourses} action="update"></EditCourse>)
                                     console.log(popContent)
@@ -95,10 +95,10 @@ const Admin= () => {
                                     setPopContent(<Delete item={course}></Delete>)
                                 }}>Delete</button>
                             </div>
-                            
                         </div>
-                    )
-                })}
+                        )
+                    })}
+                </Scroller>
                 <button onClick={()=>{
                         const emptyCourse = {
                             name: "",
@@ -109,20 +109,23 @@ const Admin= () => {
                         }
                         setPopContent(<EditCourse course={emptyCourse}subcourses={subcourses} action="create"></EditCourse>)
                         console.log(popContent)
-                    }}>new course</button>
-                </div>
-                <div id="subcourses">
-                    <h1>Sottocorsi</h1>
-                    {subcourses?.map(subcourse=>{
+                }}>new course</button>
+            </section>
+            <section id="subcourses">
+                <h1>Sottocorsi</h1>
+                <Scroller>
+                    <div className="products">
+                        {subcourses?.map(subcourse=>{
                         return (
                             <div className="subcourse product" key={subcourse._id}>
                                 <div className="cover">
                                     <img src={getFile(subcourse.coverImg)} alt="subcourse img" className="subcourse-img" />
-                                    <p>{subcourse.name}</p>
+                                    <p className="title">{subcourse.name}</p>
                                 </div>
                                 
                                 <div className="actions">
-                                    <Link to="/view" state={{type: "subcourse", id: subcourse._id }}>Go</Link>
+                                    <Link to="/view" state={{type: "subcourse", id: subcourse._id }}>
+                                        <button>Go</button></Link>
                                         <button onClick={()=>{
                                             setPopContent(<EditSubcourse subcourse={subcourse} action="update"></EditSubcourse>)
                                             console.log(popContent)
@@ -133,26 +136,23 @@ const Admin= () => {
                                 </div>
                                 
                             </div>
-                        )
-                    })}
-                     <button onClick={()=>{
-                        const emptySubcourse = {
-                            name: "",
-                            description: "",
-                            price:"",
-                            token: "",
-                            hashedId: "",
-                            _id: ""
-                        }
-                        setPopContent(<EditSubcourse subcourse={emptySubcourse} action="create"></EditSubcourse>)
-                        console.log(popContent)
-                    }}>new subcourse</button>
-                </div>
-                
-                
-                
-               
-            </div>
+                            )
+                        })}
+                    </div>
+                </Scroller>
+                <button onClick={()=>{
+                const emptySubcourse = {
+                    name: "",
+                    description: "",
+                    price:"",
+                    token: "",
+                    hashedId: "",
+                    _id: ""
+                }
+                setPopContent(<EditSubcourse subcourse={emptySubcourse} action="create"></EditSubcourse>)
+                console.log(popContent)
+            }}>new subcourse</button>
+            </section>
             <button onClick={async()=>{
                 let data = await logout();
                 console.log("logout data",data)
@@ -166,6 +166,7 @@ const Admin= () => {
                 }
                 }}>log out</button>
         </div>
+        
     )
 }
 const EditCourse = ({course, subcourses, action}) =>{
@@ -229,8 +230,7 @@ const EditCourse = ({course, subcourses, action}) =>{
                 {
                     subcourses.map(subcourse=>{
                         return (
-                            <div className="checkbox-label" key={subcourse._id}>
-                                <input type="checkbox" checked={course.subcourses.includes(subcourse._id)} onChange={(e)=>{
+                            <Checkbox checked={course.subcourses.includes(subcourse._id)} handle={(e)=>{
                                     const checkbox = e.target;
                                     const subcourses = courseData.subcourses;
                                     if(checkbox.checked) {
@@ -239,9 +239,9 @@ const EditCourse = ({course, subcourses, action}) =>{
                                         subcourses.splice(subcourses.indexOf(subcourse._id),1);
                                     }
                                     setCourseData({...courseData,subcourses})
-                                }}></input>
+                                }}>
                                 {subcourse.name}
-                            </div>)
+                           </Checkbox>)
                     })
                 }
                 <button id="save" onClick={handleEdit}>Save</button>
@@ -311,13 +311,9 @@ const EditSubcourse = ({ subcourse, action}) =>{
     )
 }
 const Delete = ({ item}) =>{
-
     const handleDelete = async() =>{
-        if(item.subcourses){
-            deleteCourse(item._id)
-        }else{
-            deleteSubcourse(item._id)
-        }
+        if(item.subcourses) deleteCourse(item._id)
+        else deleteSubcourse(item._id)
     }
     return(
             <>
