@@ -82,7 +82,7 @@ export default function CheckoutForm({itemId, itemType, credentials}) {
     return (
         <form id="stripe-form" onSubmit={handleSubmit}>
             <div id="card-element" >
-                {/*<CardElement id="payment-element" options={appearance} />*/}
+                {<CardElement id="payment-element" options={appearance} />}
             </div>
         
         <button disabled={isLoading || !stripe || !elements} id="submit">

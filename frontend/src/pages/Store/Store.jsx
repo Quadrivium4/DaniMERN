@@ -28,22 +28,21 @@ const Store = () => {
             <div id="products">
                 {store? store.map(course=>{
                     return (
-
+                        <Link to={"/product"} state={course}>
                         <div key={course.id} className="product">
-                            <Link to={"/product"} state={course}>
-                                <img className="course-img" alt="course-img" src={getFile(course.coverImg)} />
-                                <h2>{course.name}</h2>
-                                <h2 id="price">€{(course.price/100).toFixed(2)}</h2>
-                                <div id="layer"></div>
-                            </Link>
+                        <img className="course-img" alt="course-img" src={getFile(course.coverImg)} />
+                            <h2>{course.name}</h2>
+                            <h2 id="price">€{(course.price/100).toFixed(2)}</h2>
+                        <div id="layer"></div>
+                            
                             
                         </div>
-                        
+                        </Link>
                         )
                 }): <p>loading</p>}
                 
             </div>
-            {store? <img src="https://res.cloudinary.com/dkbe7c8we/image/upload/v1679289542/olympic_flag.jpg" alt="" />: <p>loading 2</p>}
+            {/*store? <img src="https://res.cloudinary.com/dkbe7c8we/image/upload/v1679289542/olympic_flag.jpg" alt="" />: <p>loading 2</p>*/}
         </div>
     )
 }

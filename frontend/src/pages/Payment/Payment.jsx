@@ -34,7 +34,8 @@ function Payment(){
     const [isSubmitted, setIsSubmitted] = useState(false);
     const dispatch = useUserDispatch();
     const [paymentType, setPaymentType] = useState();
-    const [loginPop, setLoginPop] = useState(false)
+    const [loginPop, setLoginPop] = useState(false);
+    const [couponCode, setCouponCode] = useState(false)
     const validateCredentials = async()=>{
         console.log({credentials})
         let result = await fetch(baseUrl + "/validate-credentials", {
@@ -153,9 +154,15 @@ function Payment(){
                 <PayPalScriptProvider options={{"client-id": "AdP17URr89DbDrFV6yo1WEHC1F0lf900hz8oqXaH2I8_BMgmu5ZIukifi328vMSQurAbAuSCY_OqQjbT", currency: "EUR"}}>
                     <Elements stripe={stripePromise}>
                     {stripePromise && paymentType === "credit-card" && (isSubmitted || isLogged)? (
-                        <StripeForm itemId={item.id} itemType={item.subcourses? "course": "subcourse"} credentials={credentials}/>
+                        <StripeForm 
+                            itemId={item.id} 
+                            itemType={item.subcourses? "course": "subcourse"} credentials={credentials} 
+                            couponCode={couponCode}/>
                     ) : paymentType === "paypal" && (isSubmitted || isLogged) ?
-                        <PaypalForm  itemId={item.id} itemType={item.subcourses? "course": "subcourse"} credentials={credentials} />
+                        <PaypalForm  
+                            itemId={item.id} 
+                            itemType={item.subcourses? "course": "subcourse"} credentials={credentials}
+                            couponCode={couponCode} />
                     : null
                     }
                     </Elements>

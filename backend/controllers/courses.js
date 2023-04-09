@@ -6,7 +6,9 @@ const fs = require("fs");
 const { UNAUTHORIZED, RESOURCE_NOT_FOUND } = require("../constants/errorCodes");
 const getStore = async (req, res) => {
     const store = [];
-    const courses = await Course.find({});
+    let init = Date.now()
+    const courses = await Course.find({})
+
     for (const course of courses) {
         let subcourses = [];
         for  (const subcourseId of course.subcourses) {
@@ -32,6 +34,7 @@ const getStore = async (req, res) => {
             subcourses: subcourses
         })
     }
+    console.log(Date.now() - init);
     res.send({
         ok: true,
         courses: store

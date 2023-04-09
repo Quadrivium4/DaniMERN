@@ -159,7 +159,7 @@ const UnverifiedUserSchema = new mongoose.Schema({
     password: {
         type: String,
         trim: true,
-        rquired: true
+        required: true
     },
     token: {
         type: String,
@@ -167,11 +167,51 @@ const UnverifiedUserSchema = new mongoose.Schema({
     }
 });
 const UnverifiedUser = mongoose.model("UnverifiedUser", UnverifiedUserSchema);
+const CouponCodeSchema = new mongoose.Schema({
+    amount: {
+        type: Number
+    },
+    expires: {
+        type: Date,
+        default: Date.now() + 1000 * 60 * 60 * 24
+    }
+})
+const CouponCode = mongoose.model("CouponCode", CouponCodeSchema);
+const PromotionCodeSchema = new mongoose.Schema({
+    user: {
+        type: String
+    },
+    amount: {
+        type: Number
+    },
+    product: {
+        type: String
+    }
+})
+const PromotionCode = mongoose.model("PromotionCode", PromotionCodeSchema);
+const DiscountSchema = new mongoose.Schema({
+    amount: {
+        type: Number,
+        required: true
+    },
+    product: {
+        type: String,
+        required: true
+    },
+    expires: {
+        type: Date,
+        default: Date.now() + 1000 * 60 * 60 * 24
+    }
+})
+const Discount = mongoose.model("Discount", DiscountSchema);
 module.exports ={
     User,
     Course,
     Subcourse,
     Review,
     PaypalOrder,
-    UnverifiedUser
+    UnverifiedUser,
+    Discount,
+    PromotionCode,
+    CouponCode
 }

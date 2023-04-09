@@ -95,7 +95,7 @@ const uploadUserVideo = async (req, res) => {
         }, {
             new: true
         });
-        sendMail(`
+        /*sendMail(`
             Hi Dani,
             ${user.name} wants a feedback from you!
             <a href="${process.env.CLIENT_URL}">Give It!</a>
@@ -103,7 +103,7 @@ const uploadUserVideo = async (req, res) => {
             console.log("email sent", result)
         }).catch(err=>{
             console.log("ops error!", err)
-        })
+        })*/
         console.log(updatedUser)
     }
     
