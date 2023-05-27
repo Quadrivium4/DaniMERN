@@ -2,7 +2,7 @@ import {PayPalButtons} from "@paypal/react-paypal-js";
 import { useState } from "react";
 import { baseUrl } from "../../App";
 import Message from "../../components/Message";
-const PaypalForm = ({itemId, itemType, credentials}) =>{
+const PaypalForm = ({itemId, itemType, credentials, couponId}) =>{
     const [message, setMessage] = useState();
     const createOrder = async(data, actions)=>{
         console.log({credentials}, this)
@@ -14,7 +14,7 @@ const PaypalForm = ({itemId, itemType, credentials}) =>{
             headers: {
                 "Content-type": "application/json"
             },
-            body: JSON.stringify({itemId, itemType, ...credentials})
+            body: JSON.stringify({itemId, itemType, couponId, ...credentials})
         }).then(res => res.json()).catch(err=>{
             console.log("hi jfkdlsa;fjkdslf;dsjfklds;")
             setMessage({content: err.message, type: "error"})

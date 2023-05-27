@@ -19,6 +19,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         trim: true,
     },
+    paypalId: {
+        type:String,
+        trim: true
+    },
     profileImg: {
         type: String
     },
@@ -190,13 +194,17 @@ const PromotionCodeSchema = new mongoose.Schema({
 })
 const PromotionCode = mongoose.model("PromotionCode", PromotionCodeSchema);
 const DiscountSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
     amount: {
         type: Number,
         required: true
     },
-    product: {
-        type: String,
-        required: true
+    targets: {
+        type: Array,
+        require: true
     },
     expires: {
         type: Date,

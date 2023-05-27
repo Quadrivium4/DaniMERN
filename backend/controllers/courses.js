@@ -34,7 +34,7 @@ const getStore = async (req, res) => {
             subcourses: subcourses
         })
     }
-    console.log(Date.now() - init);
+    //console.log(Date.now() - init);
     res.send({
         ok: true,
         courses: store

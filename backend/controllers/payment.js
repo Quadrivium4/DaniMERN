@@ -1,27 +1,33 @@
 require("dotenv").config();
-const { User, Course, Subcourse, PaypalOrder } = require("../models");
+const { User, Course, Subcourse, PaypalOrder,Discount } = require("../models");
 const { sendMail } = require("../utils");
 
 const { register } = require("../utils/user");
 const path = require("path");
 const fs = require("fs");
-const { createOrder, capturePayment, retrieveOrder } = require("../utils/paypal");
-const {getStripeCustomer,  createStripeCustomer, confirmStripePayment, getStripePayment, createStripePayment} = require("../utils/stripe");
+const { createOrder, capturePayment, retrieveOrder, sendPayment } = require("../utils/paypal");
+const {getStripeCustomer,  createStripeCustomer, confirmStripePayment, getStripePayment, createStripePayment, getPaymentMethod} = require("../utils/stripe");
+const { isValidObjectId } = require("mongoose");
+const {checkCoupon} = require("../utils/discounts");
 const clientUrl = process.env.NODE_ENV === "production" ? process.env.ONLINE_CLIENT_URL : process.env.CLIENT_URL;
 const baseUrl = process.env.NODE_ENV === "production" ? process.env.ONLINE_BASE_URL : process.env.BASE_URL;
 
 const validateCredentials = async(req, res)=>{
-    console.log("hi",{email: req.session.userEmail})
     if(req.session.userEmail) return res.send({message: true})
-    console.log(req.body)
     const {name, email, password} = req.body;
     await register(name, email, password);
     res.send({message: true})
 }
+const validateCoupon = async(req, res) =>{
+    console.log("validating...", req.body);
+    const {itemId, couponId} = req.body;
+    const {coupon, item, total} = await checkCoupon(itemId, couponId);
+    res.send({message: "Valid coupon: ",initial: item.price, coupon: coupon.amount, total});
+}
 const createPaypalOrder = async(req, res)=>{
     console.log("creating paypal order", req.body);
 
-    const {itemId, itemType, email, name, password} = req.body;
+    const {itemId, itemType, email, name, password, couponId} = req.body;
     let item;
     if (itemType === "course") item = await Course.findById(itemId);
     else if (itemType === "subcourse") item = await Subcourse.findById(itemId);
@@ -29,6 +35,12 @@ const createPaypalOrder = async(req, res)=>{
         throw new AppError(1, 404, "No item with that id")
     }
     let paypalOrder;
+    let price = item.price;
+    if (couponId) {
+        const { coupon, total } = await checkCoupon(itemId, couponId);
+        console.log({total})
+        price = total;
+    }
     if(!req.session.userEmail){
         const hashedPassword = await register(name, email, password);
         paypalOrder = await PaypalOrder.create({
@@ -37,12 +49,12 @@ const createPaypalOrder = async(req, res)=>{
                 email,
                 password: hashedPassword
             },
-            amount: item.price,
+            amount: price,
             itemId,
             itemType
         })
     }else{
-        const user = await User.findOne({email: req.session.userEmail});
+        let user = await User.findOne({email: req.session.userEmail});
         if (user.courses.includes(itemId) || user.subcourses.includes(itemId)) throw new AppError(1, 400, "You already bought this course!");
         paypalOrder = await PaypalOrder.create({
             customer: {
@@ -50,7 +62,7 @@ const createPaypalOrder = async(req, res)=>{
                 email: user.email,
                 password: user.password
             },
-            amount: item.price,
+            amount: price,
             itemId,
             itemType
         })
@@ -59,7 +71,7 @@ const createPaypalOrder = async(req, res)=>{
     
     
 
-    const { link, token, id } = await createOrder(item, paypalOrder._id);
+    const { link, token, id } = await createOrder(price, item, paypalOrder._id);
     await PaypalOrder.findByIdAndUpdate(paypalOrder._id, {
         orderId: id
     })
@@ -79,7 +91,7 @@ const approvePaypalOrder = async(req, res) =>{
 const capturePaypalOrder = async (req, res) => {
     console.log("capturing paypal order", req.body);
     const {id} = req.params;
-    const { purchase_units } = await capturePayment(id);
+    const { purchase_units, payer } = await capturePayment(id);
     let unit = purchase_units[0];
     let {payments: {captures}} = unit;
     let purchase = captures[0];
@@ -106,7 +118,8 @@ const capturePaypalOrder = async (req, res) => {
             password,
             email,
             courses,
-            subcourses
+            subcourses,
+            paypalId: payer.payer_id
         })
 
         req.session.userEmail = email;
@@ -128,7 +141,8 @@ const capturePaypalOrder = async (req, res) => {
 
 const createPaymentIntent = async(req, res) =>{
     console.log("create stripe payment", req.body);
-    let { itemId, itemType, email, name, password, paymentMethodId } = req.body;
+    let { itemId, itemType, email, name, password, paymentMethodId, couponId } = req.body;
+    
     let user;
     let customer;
     if (!req.session.userEmail) password = await register(name, email, password);
@@ -147,7 +161,16 @@ const createPaymentIntent = async(req, res) =>{
     else if (itemType === "subcourse") item = await Subcourse.findById(itemId);
     else throw new AppError(1, 404, "No item with that id");
     
-    const paymentIntent = await createStripePayment(paymentMethodId, customer.id, item.price, itemId, itemType);
+    let price = item.price;
+    if (couponId) {
+        const { coupon, total } = await checkCoupon(itemId, couponId);
+        price = total;
+    }
+    // todo save payment method to customer
+    const paymentMethod =  await getPaymentMethod(paymentMethodId);
+    paymentMethod.customer = customer.id;
+    console.log({paymentMethod});
+    const paymentIntent = await createStripePayment(paymentMethodId, customer.id, price, itemId, itemType);
     sendMail(`Confirm Payment: <a href="${baseUrl}/confirm-payment-intent/${paymentIntent.id}">confirm</a>`, email, "Confirm Payment")
     return res.send({ message: "We sent you an email" });
 }
@@ -205,12 +228,18 @@ const confirmPaymentIntent = async (req, res) =>{
     return res.redirect(clientUrl);
 }
 
-
+const pay = async (req, res)=>{
+    const user = req.user;
+    console.log("hello world", user.paypalId)
+    sendPayment(user.paypalId, 100)
+}
 module.exports = {
     validateCredentials,
+    validateCoupon,
     createPaymentIntent,
     confirmPaymentIntent,
     capturePaypalOrder,
     approvePaypalOrder,
-    createPaypalOrder
+    createPaypalOrder,
+    pay
 }

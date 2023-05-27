@@ -104,7 +104,7 @@ const uploadUserVideo = async (req, res) => {
         }).catch(err=>{
             console.log("ops error!", err)
         })*/
-        console.log(updatedUser)
+        //console.log(updatedUser)
     }
     
     /*const email = req.session.userEmail;

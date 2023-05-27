@@ -24,7 +24,21 @@ const deleteSubcourse = async(id)=>{
 const postReview = async(body)=>{
     return await crossing(protectedUrl + "/review", "POST", body)
 }
-
+const postDiscount = async(discount)=>{
+    return await crossing(protectedUrl + "/discount", "POST", discount)
+}
+const updateDiscount = async (discount) => {
+    return await crossing(protectedUrl + "/discount", "PUT", discount)
+}
+const deleteDiscount = async (id) => {
+    return await crossing(protectedUrl + "/discount/" + id, "DELETE")
+}
+const getDiscounts = async () => {
+    return await crossing(protectedUrl + "/discount");
+}
+const getDiscount = async (id) => {
+    return await crossing(protectedUrl + "/discount/" + id);
+}
 export {
     postCourse,
     postSubcourse,
@@ -32,5 +46,10 @@ export {
     updateSubcourse,
     deleteCourse,
     deleteSubcourse,
-    postReview
+    postDiscount,
+    updateDiscount,
+    deleteDiscount,
+    postReview,
+    getDiscount,
+    getDiscounts
 }

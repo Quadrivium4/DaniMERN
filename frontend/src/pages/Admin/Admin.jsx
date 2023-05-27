@@ -9,6 +9,11 @@ import {
     updateSubcourse,
     deleteCourse,
     deleteSubcourse,
+    getDiscounts,
+    getDiscount,
+    postDiscount,
+    updateDiscount,
+    deleteDiscount
 } from "../../admin";
 import { logout, getSubcourses, getCourses, getReviews, getFile } from "../../controllers";
 import "./Admin.css"
@@ -23,14 +28,25 @@ const Admin= () => {
     const {info, courses, subcourses} = useUser();
     const dispatch = useUserDispatch()
     const [popContent, setPopContent] = useState();
-    const [reviews, setReviews] = useState() 
+    const [reviews, setReviews] = useState();
+    const [discounts, setDiscounts] = useState();
     useEffect(()=>{
         console.log(courses, subcourses)
+        if(!discounts) {
+            const getData = async()=>{
+                let {discounts: discountsData} = await getDiscounts();
+                console.log(discountsData);
+                setDiscounts(discountsData);
+            }
+            getData();
+            
+        }
         if(!courses || !subcourses){
             const getData = async()=>{
                 console.log("get Data runned")
                 let {courses: coursesData} = await getCourses();
                 let {subcourses: subcoursesData} = await getSubcourses();
+                
                 
                 if(!coursesData) coursesData = [];
                 if(!subcoursesData) subcoursesData = [];
@@ -92,7 +108,7 @@ const Admin= () => {
                                     console.log(popContent)
                                 }}>Edit</button>
                                 <button onClick={()=>{
-                                    setPopContent(<Delete item={course}></Delete>)
+                                    setPopContent(<Delete item={course} handle={deleteCourse}></Delete>)
                                 }}>Delete</button>
                             </div>
                         </div>
@@ -131,7 +147,7 @@ const Admin= () => {
                                             console.log(popContent)
                                         }}>Edit</button>
                                         <button onClick={()=>{
-                                            setPopContent(<Delete item={subcourse}></Delete>)
+                                            setPopContent(<Delete item={subcourse} handle={deleteSubcourse}></Delete>)
                                         }}>Delete</button>
                                 </div>
                                 
@@ -150,8 +166,61 @@ const Admin= () => {
                     _id: ""
                 }
                 setPopContent(<EditSubcourse subcourse={emptySubcourse} action="create"></EditSubcourse>)
-                console.log(popContent)
+                
             }}>new subcourse</button>
+            </section>
+            <section id="discounts">
+                <h1>Discounts</h1>
+                <Scroller>
+                    {
+                        discounts?.map(discount=>{
+                            return(
+                                <div className="discount" key={discount._id}>
+                                    <h3>{discount.name}</h3>
+                                    <p>code: {discount._id}</p>
+                                    <p>amount: {discount.amount}</p>
+                                    <ul>targets:
+                                        {
+                                            discount.targets.map(item=>{
+                                                let name;
+                                                let course = courses.find(course=> course._id === item );
+                                                if(course) name = course.name;
+                                                let subcourse = subcourses.find(subcourse=> subcourse._id === item );
+                                                if(subcourse) name = subcourse.name;
+                                                return <li key={name}>- {name}</li>
+                                            
+                                            })
+                                        }
+                                    </ul>
+                                    <div className="actions">
+                                        <button onClick={()=>{
+                                            setPopContent(<EditDiscount discount={discount} subcourses={subcourses} courses={courses} action="update"></EditDiscount>)
+                                            console.log(popContent)
+                                        }}>Edit</button>
+                                        <button onClick={()=>{
+                                            setPopContent(<Delete item={discount} handle={deleteDiscount}></Delete>)
+                                        }}>Delete</button>
+                                </div>
+                                </div>
+                            )
+                        })
+                    }
+                </Scroller>
+                <button onClick={()=>{
+                    const emptyDiscount = {
+                        targets: [],
+                        expires: 1,
+                        amount:"",
+                        _id: ""
+                    }
+                setPopContent(<EditDiscount discount={emptyDiscount} subcourses={subcourses} courses={courses} action="create"></EditDiscount>)
+                }}>new discount</button>
+            </section>
+            <section id="promotion-codes">
+                <h1>Promotions</h1>
+                <Scroller>
+                    
+                </Scroller>
             </section>
             <button onClick={async()=>{
                 let data = await logout();
@@ -169,9 +238,68 @@ const Admin= () => {
         
     )
 }
+const EditDiscount = ({discount, action, toggle}) =>{
+    const {courses, subcourses} = useUser();
+    const [discountData, setDiscountData] = useState({
+        id: discount._id,
+        name: discount.name,
+        targets: discount.targets,
+        expires: discount.expires,
+        amount: discount.amount,
+    })
+    const handleEdit = () =>{
+        if(action === "create") postDiscount(discountData);
+        else if(action === "update") updateDiscount(discountData);
+    }
+    return (
+        <>
+            <h1>Edit</h1>
+            <p>Name:</p>
+            <input type="text" value={discountData.name} onChange={(e)=>setDiscountData({...discountData, name: e.target.value})}/>
+            <p>Expire:</p>
+            <input type="number" value={discountData.expires} onChange={(e)=>setDiscountData({...discountData, expires: e.target.value})} />
+            <p>Targets:</p>
+            {courses.map((course, i)=>{
+                return (
+                    <Checkbox checked={discount.targets.includes(course._id)} handle={(e)=>{
+                        const checkbox = e.target;
+                        const targets = discountData.targets;
+                        if(checkbox.checked) {
+                            targets.push(course._id);
+                        }else{
+                            targets.splice(targets.indexOf(course._id),1);
+                        }
+                        setDiscountData({...discountData, targets })
+                    }
+                    }>{course.name} (course)</Checkbox>
+                )
+            })}
+            {subcourses.map((subcourse, i)=>{
+                return (
+                    <Checkbox checked={discount.targets.includes(subcourse._id)} handle={(e)=>{
+                        const checkbox = e.target;
+                        const targets = discountData.targets;
+                        if(checkbox.checked) {
+                            targets.push(subcourse._id);
+                        }else{
+                            targets.splice(targets.indexOf(subcourse._id),1);
+                        }
+                        setDiscountData({...discountData, targets})
+                    }
+                    }>{subcourse.name} (subcourse)</Checkbox>
+                )
+            })}
+            <p>Amount (in %)</p>
+            <input type="number" value={discountData.amount} min={0} max={100} onChange={(e)=>setDiscountData({...discountData, amount: e.target.value})}></input>
+            <button onClick={handleEdit}>Save</button>
+        </>
+        
+    )
+}
 const EditCourse = ({course, subcourses, action}) =>{
     const imgPreview = useRef(null);
     const [defaultFile, setDefaultFile] = useState();
+    console.log(course)
     const [courseData, setCourseData] = useState({
         name: course.name,
         description: course.description,
@@ -194,14 +322,9 @@ const EditCourse = ({course, subcourses, action}) =>{
                 }
                 console.log(key, value)
             }
-        if(action === "update"){
-            
-            updateCourse(form)
-        }else if(action === "create"){
-            postCourse(form);
-        }else{
-            console.log("unknown action")
-        }
+        if(action === "update") updateCourse(form)
+        else if(action === "create") postCourse(form);
+        else console.log("unknown action")
         
     }
     return(
@@ -310,10 +433,9 @@ const EditSubcourse = ({ subcourse, action}) =>{
             </>
     )
 }
-const Delete = ({ item}) =>{
+const Delete = ({ item, handle}) =>{
     const handleDelete = async() =>{
-        if(item.subcourses) deleteCourse(item._id)
-        else deleteSubcourse(item._id)
+        handle(item._id);
     }
     return(
             <>

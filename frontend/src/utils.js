@@ -22,7 +22,16 @@ const crossing = async(url, method = "GET", body) =>{
             },
             body: JSON.stringify(body),
             
-        }).then(res => res.json());
+        }).then(async res => {
+            
+            if(!res.ok){
+                let response = await res.json();
+                throw response;
+            }else{
+                return res.json()
+            }
+            
+        });
     }else{
         console.log("invalid method")
     }

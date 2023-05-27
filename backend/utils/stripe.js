@@ -1,5 +1,7 @@
 require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
+
 const createStripeCustomer = async(name, email, password) => {
     const customer = await stripe.customers.create({
         name,
@@ -10,6 +12,10 @@ const createStripeCustomer = async(name, email, password) => {
         }
     })
     return customer;
+}
+const getPaymentMethod = async(paymentMethodId)=>{
+    const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+    return paymentMethod;
 }
 const getStripeCustomer = async(stripeId) =>{
     const customer = await stripe.customers.retrieve(stripeId);
@@ -46,12 +52,20 @@ const getStripePayment = async(intentId)=>{
     const paymentIntent = await stripe.paymentIntents.retrieve(intentId);
     return paymentIntent;
 }
-
+const createPayout = async()=>{
+    const payout = await stripe.payouts.create({
+        amount: 5000,
+        currency: "eur"
+    })
+    return payout;
+}
 module.exports ={
     createStripeCustomer,
     getStripeCustomer,
     confirmStripePayment,
     createStripePayment,
     deleteStripeCustomer,
-    getStripePayment
+    getStripePayment,
+    getPaymentMethod,
+    createPayout
 }

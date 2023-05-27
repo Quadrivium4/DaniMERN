@@ -3,15 +3,14 @@
 // https://github.com/paypal-examples/docs-examples/tree/main/standard-integration
 require("dotenv").config();
 const urlModule = require("url");
-const baseURL = {
-    sandbox: "https://api-m.sandbox.paypal.com",
-    production: "https://api-m.paypal.com"
-};
+const baseURL = process.env.NODE_ENV === "production" ?
+    "https://api-m.paypal.com" :
+    "https://api-m.sandbox.paypal.com";
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
 
-async function createOrder(item, custom_id) {
+async function createOrder(total, item, custom_id) {
         const accessToken = await generateAccessToken();
-        const url = `${baseURL.sandbox}/v2/checkout/orders`;
+        const url = `${baseURL}/v2/checkout/orders`;
         const response = await fetch(url, {
             method: "POST",
             headers: {
@@ -24,7 +23,17 @@ async function createOrder(item, custom_id) {
                     {
                         amount: {
                             currency_code: "eur",
-                            value: item.price/100,
+                            value: total/100,
+                            breakdown: {
+                                item_total:{
+                                    currency_code: "eur",
+                                    value: item.price/100
+                                },
+                                discount: {
+                                    currency_code: "eur",
+                                    value:(item.price-total)/100
+                                }
+                            }
                         },
                         custom_id
                     },
@@ -40,7 +49,7 @@ async function createOrder(item, custom_id) {
                 break;
             }
         }
-        //console.log(data, link)
+        console.log({data, link, details: data.details})
         let {token} = urlModule.parse(link, true).query
         return { link, token, id};
 }
@@ -48,7 +57,7 @@ async function createOrder(item, custom_id) {
 // use the orders api to capture payment for an order
 async function capturePayment(orderId) {
     const accessToken = await generateAccessToken();
-    const url = `${baseURL.sandbox}/v2/checkout/orders/${orderId}/capture`;
+    const url = `${baseURL}/v2/checkout/orders/${orderId}/capture`;
     const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -61,7 +70,8 @@ async function capturePayment(orderId) {
 }
 async function retrieveOrder(orderId){
     const accessToken = await generateAccessToken();
-    const url = `${baseURL.sandbox}/v2/checkout/orders/${orderId}`;
+    const url = `${baseURL}/v2/checkout/orders/${orderId}`;
+    console.log({url})
     const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -77,7 +87,7 @@ async function generateAccessToken() {
     //console.log(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET)
     const auth = Buffer.from(PAYPAL_CLIENT_ID + ":" + PAYPAL_CLIENT_SECRET).toString("base64");
     //console.log(auth)
-    const response = await fetch(`${baseURL.sandbox}/v1/oauth2/token`, {
+    const response = await fetch(`${baseURL}/v1/oauth2/token`, {
         method: "POST",
         body: "grant_type=client_credentials",
         headers: {
@@ -89,9 +99,42 @@ async function generateAccessToken() {
     //console.log({data})
     return data.access_token;
 }
-
+const sendPayment = async(paypalId, amount)=>{
+    console.log("sending payment...", paypalId, amount)
+    const accessToken = await generateAccessToken();
+    console.log(`Bearer ${accessToken}`)
+    const url = `${baseURL}/v1/payments/payouts`;
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+            items: [
+                {
+                    receiver: paypalId,
+                    amount: {
+                        currency: "EUR",
+                        value: amount
+                    },
+                    recipient_type: "PAYPAL_ID",
+                    note: "Thanks for your patronage!",
+                }
+            ],
+            sender_batch_header: {
+                //sender_batch_id: "Payouts_2020_100007",
+                email_subject: "You have a payout!",
+                email_message: "You have received a payout! Thanks for using our service!"
+            }
+        })
+    })
+    const data = await response.json();
+    console.log({data})
+}
 module.exports = {
     capturePayment,
     retrieveOrder,
-    createOrder
+    createOrder,
+    sendPayment
 }

@@ -15,6 +15,7 @@ import "./Payment.css"
 import creditCards from "../../assets/icons/credit-cards.png";
 import paypalLogo from "../../assets/icons/paypal-logo.png";
 import PaymentOption from "./components/PaymentOption";
+import CouponValidation from "./components/CouponCode";
 const PUBLIC_KEY = "pk_test_51MKGlKC6B9y91JPQ5ZiXoWTOzDT36UPJicGYV1V7pg1HnjRZ28jZMywuzxcVOLrnriuWrEmyGq0YHFVAwvne7MBy00X45DXHLQ";
 const stripePromise = loadStripe(PUBLIC_KEY);
 
@@ -152,17 +153,18 @@ function Payment(){
             {(
                 <>
                 <PayPalScriptProvider options={{"client-id": "AdP17URr89DbDrFV6yo1WEHC1F0lf900hz8oqXaH2I8_BMgmu5ZIukifi328vMSQurAbAuSCY_OqQjbT", currency: "EUR"}}>
+                    <CouponValidation item={item} setCoupon={setCouponCode}></CouponValidation>
                     <Elements stripe={stripePromise}>
                     {stripePromise && paymentType === "credit-card" && (isSubmitted || isLogged)? (
                         <StripeForm 
                             itemId={item.id} 
                             itemType={item.subcourses? "course": "subcourse"} credentials={credentials} 
-                            couponCode={couponCode}/>
+                            couponId={couponCode}/>
                     ) : paymentType === "paypal" && (isSubmitted || isLogged) ?
                         <PaypalForm  
                             itemId={item.id} 
                             itemType={item.subcourses? "course": "subcourse"} credentials={credentials}
-                            couponCode={couponCode} />
+                            couponId={couponCode} />
                     : null
                     }
                     </Elements>
