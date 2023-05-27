@@ -8,6 +8,7 @@ import ProgressBar from "../../components/ProgressBar/ProgressBar";
 import uploadIcon from '../../assets/icons/carica.png';
 import accountImg from "../../assets/images/account-picture.png"
 import "./Dashboard.css"
+import { crossing } from "../../utils";
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -198,8 +199,8 @@ const Dashboard = () => {
                     </div>
                     
                 </div>
-            
-                    </div>
+                <button onClick={()=>crossing(protectedUrl + "/pay")}>pay</button>
+            </div>
             <div id="purchases" className="section">
                 <h1>Aquisti</h1>
                 <h2>Corsi</h2>

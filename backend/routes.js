@@ -6,30 +6,37 @@ const { login, register, getUser, uploadUserImg, logout, registerConfirmation, u
 const {postCourse, putCourse, getCourse, getPublicCourse, getCourses, getStore, deleteCourse, testUpload} = require("./controllers/courses")
 const { postSubcourse, putSubcourse, getSubcourse, getSubcourses, deleteSubcourse } = require("./controllers/subcourses");
 const {getReviews, postReview, deleteReview, putReview} = require("./controllers/reviews")
-const {confirmPaymentIntent,createPaymentIntent, stripeEvents, createPaypalOrder, capturePaypalOrder, approvePaypalOrder, validateCredentials} = require("./controllers/payment");
+const {confirmPaymentIntent,createPaymentIntent, stripeEvents, createPaypalOrder, capturePaypalOrder, approvePaypalOrder, validateCredentials, validateCoupon, pay} = require("./controllers/payment");
 const { tryCatch } = require("./utils");
 const { verifyUser} = require("./middlewares/verifyUser");
 const { errorHandler} = require("./middlewares/errorHandler");
 const {downloadFile} = require("./utils/files");
-const {createDiscount} = require("./controllers/discounts")
+const {createDiscount, getDiscount, getDiscounts, deleteDiscount, updateDiscount} = require("./controllers/discounts");
+
+
 
 
 
 
 publicRouter.get("/files/:id", tryCatch(downloadFile))
 
-console.log(verifyUser)
 protectedRouter.use(tryCatch(verifyUser));
 protectedRouter.route("/test-upload").post(tryCatch(testUpload));
 protectedRouter.route("/subcourse")
     .get(tryCatch(getSubcourses))
     .post(tryCatch(postSubcourse))
     .put(tryCatch(putSubcourse))
-
+protectedRouter.route("/pay").get(tryCatch(pay))
 protectedRouter.route("/course")
     .get(tryCatch(getCourses))
     .post(tryCatch(postCourse))
     .put(tryCatch(putCourse))
+
+protectedRouter.route("/discount")
+    .get(tryCatch(getDiscounts))
+    .post(tryCatch(createDiscount))
+    .put(tryCatch(updateDiscount))
+
 protectedRouter.route("/review")
     .get(tryCatch(getReviews))
     .post(tryCatch(postReview))
@@ -46,6 +53,10 @@ protectedRouter.route("/course/:id")
 protectedRouter.route("/review/:id")
     .delete(tryCatch(deleteReview))
 
+protectedRouter.route("/discount/:id")
+    .get(tryCatch(getDiscount))
+    .delete(tryCatch(deleteDiscount))
+
 
 protectedRouter.route("/user/upload").post(tryCatch(uploadUserImg))
 protectedRouter.route("/user/upload/videos").post(tryCatch(uploadUserVideo))
@@ -54,6 +65,7 @@ protectedRouter.route("/user")
     .delete(tryCatch(deleteUser))
 protectedRouter.route("/logout").get(tryCatch(logout))
 
+publicRouter.route("/validate-coupon").post(tryCatch(validateCoupon))
 publicRouter.route("/create-payment-intent").post(tryCatch(createPaymentIntent))
 publicRouter.route("/confirm-payment-intent/:id").get(tryCatch(confirmPaymentIntent))
 

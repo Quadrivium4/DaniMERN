@@ -11,6 +11,7 @@ const initialState = {
     info: null,
     courses: null,
     subcourses: null,
+    discounts: null,
     videos: null,
     store: null,
 }
@@ -58,7 +59,7 @@ export const Context = ({children}) =>{
 
                     dispatch({ type: "SET_INFO", value: data.user });
                     dispatch({ type: "SET_COURSES", value: data.courses });
-                    dispatch({ type: "SET_SUBCOURSES", value: data.subcourses })
+                    dispatch({ type: "SET_SUBCOURSES", value: data.subcourses });
                     dispatch({ type: "SET_LOGGED", value: true });
                     return;
                 }

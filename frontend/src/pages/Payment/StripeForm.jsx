@@ -35,7 +35,7 @@ const appearance = {
     }
   };
 
-export default function CheckoutForm({itemId, itemType, credentials}) {
+export default function CheckoutForm({itemId, itemType, credentials, couponId}) {
     const stripe = useStripe();
     const elements = useElements();
     const [message, setMessage] = useState(null);
@@ -52,6 +52,7 @@ export default function CheckoutForm({itemId, itemType, credentials}) {
             type: 'card',
             card: elements.getElement(CardElement)
         });
+        let {errorCard, card} = await stripe.createToken()
         if(error){
             setIsLoading(false);
             return setMessage({type: "error", content: error.message})
@@ -62,7 +63,7 @@ export default function CheckoutForm({itemId, itemType, credentials}) {
             withCredentials: true,
             credentials: "include",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({itemId, itemType, email: credentials.email, paymentMethodId: paymentMethod.id, name: credentials.name,password: credentials.password})
+            body: JSON.stringify({itemId, itemType, email: credentials.email, paymentMethodId: paymentMethod.id, name: credentials.name,password: credentials.password, couponId})
         } ).then(async(res)=>{
             if(res.ok){
                 return res.json();

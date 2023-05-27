@@ -47,6 +47,10 @@ const deleteReview = async(id) =>{
 const deleteUser = async() =>{
     return await crossing(protectedUrl + "/user", "DELETE")
 }
+const validateCoupon = async(body) =>{
+    return await crossing(baseUrl + "/validate-coupon","POST", body)
+}
+
 export {
     login,
     register,
@@ -59,5 +63,6 @@ export {
     getReviews,
     deleteReview,
     deleteUser,
-    getFile
+    getFile,
+    validateCoupon
 }
