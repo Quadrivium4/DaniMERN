@@ -8,6 +8,13 @@
 
 #store .product{
     display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+#store .cover {
+    display: flex;
     width: 100%;
     height: 100%;
     position: relative;

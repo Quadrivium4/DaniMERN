@@ -44,14 +44,14 @@ const postSubcourse = async (req, res) => {
     let user = req.user;
     if (user.role !== "admin") throw new AppError(1, 403, "You are not an admin");
     const fileId = await saveFile(req.files.coverImg);
-    Subcourse.create({
+    const subcourse = await Subcourse.create({
         name,
         description,
         price,
         hashedId,
         coverImg: fileId
     })
-    res.send({message: "subcourse created"})
+    res.send({message: "subcourse created", subcourse})
 }
 
 const putSubcourse = async (req, res) => {
@@ -73,6 +73,7 @@ const putSubcourse = async (req, res) => {
     if(oldSubcourse.coverImg) await deleteFile(oldSubcourse.coverImg);
     
     console.log("old subcourse:", oldSubcourse);
+    //console.log("new subcourse", )
 }
 const deleteSubcourse = async (req, res) => {
     const { id } = req.params;

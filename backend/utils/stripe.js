@@ -25,7 +25,8 @@ const deleteStripeCustomer = async(stripeId) =>{
     const customer = await stripe.customers.del(stripeId);
     return customer;
 }
-const createStripePayment = async(paymentMethodId, customerId ,itemPrice,itemId, itemType) =>{
+const createStripePayment = async(paymentMethodId, customerId ,itemPrice,itemId, itemType, receiver) =>{
+    console.log("receiver", {receiver})
     const payment = await stripe.paymentIntents.create({
         amount: itemPrice,
         currency: "eur",
@@ -33,7 +34,8 @@ const createStripePayment = async(paymentMethodId, customerId ,itemPrice,itemId,
         payment_method: paymentMethodId,
         metadata: {
             itemId,
-            itemType
+            itemType,
+            receiver
         }
     });
     return payment

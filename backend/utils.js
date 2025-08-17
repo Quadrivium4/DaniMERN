@@ -182,7 +182,7 @@ function createPdfReview(name, title, username, img, fields, priceRange, comment
         })
         .fillColor("white")
         .fontSize(18)
-        .font("./public/fonts/tahoma.ttf")
+        .font("./public/fonts/Inter-Bold.ttf")
         .text(`Titolo: "${title}"`, HEADER_WIDTH / 2.5 + HEADER_X + 15, HEADER_Y + 20, {
 
         })

@@ -21,7 +21,10 @@ const validateCredentials = async(req, res)=>{
 const validateCoupon = async(req, res) =>{
     console.log("validating...", req.body);
     const {itemId, couponId} = req.body;
-    const {coupon, item, total} = await checkCoupon(itemId, couponId);
+    const {isAffiliateCoupon, item, total} = await checkCoupon(itemId, couponId);
+    if(isAffiliateCoupon){
+        return res.send({ message: "Valid coupon: ", initial: item.price, coupon: 10, total });
+    }
     res.send({message: "Valid coupon: ",initial: item.price, coupon: coupon.amount, total});
 }
 const createPaypalOrder = async(req, res)=>{
@@ -29,6 +32,7 @@ const createPaypalOrder = async(req, res)=>{
 
     const {itemId, itemType, email, name, password, couponId} = req.body;
     let item;
+    let receiver;
     if (itemType === "course") item = await Course.findById(itemId);
     else if (itemType === "subcourse") item = await Subcourse.findById(itemId);
     else {
@@ -37,7 +41,9 @@ const createPaypalOrder = async(req, res)=>{
     let paypalOrder;
     let price = item.price;
     if (couponId) {
-        const { coupon, total } = await checkCoupon(itemId, couponId);
+        const {total, isAffiliateCoupon} = await checkCoupon(itemId, couponId);
+        console.log({total, isAffiliateCoupon})
+        if(isAffiliateCoupon) receiver = await User.findById(couponId);
         console.log({total})
         price = total;
     }
@@ -50,6 +56,11 @@ const createPaypalOrder = async(req, res)=>{
                 password: hashedPassword
             },
             amount: price,
+            hasCoupon: receiver && receiver.paypalId ? true : false,
+            coupon: { 
+                amountInEur: (item.price / 100 * 10 /* <--- percentage */) / 100 /* to EUR (paypal required)*/,
+                receiver: receiver.paypalId
+            },
             itemId,
             itemType
         })
@@ -63,6 +74,11 @@ const createPaypalOrder = async(req, res)=>{
                 password: user.password
             },
             amount: price,
+            hasAffiliateCoupon: receiver ? true : false,
+            affiliateCoupon: {
+                amountInEur: (item.price / 100 * 10 /* <--- percentage */)  /100 /* to EUR (paypal required)*/ ,
+                receiver: receiver?.paypalId
+            },
             itemId,
             itemType
         })
@@ -84,7 +100,7 @@ const approvePaypalOrder = async(req, res) =>{
     let order = await retrieveOrder(orderId);
     console.log({order: order.purchase_units, first: order.purchase_units[0]})
     let paypalOrder = await PaypalOrder.findById(order.purchase_units[0].custom_id);
-    console.log(paypalOrder)
+    console.log({paypalOrder})
     const result = await sendMail(`Confirm Paypal Payment: <a href="${baseUrl}/capture-paypal-order/${orderId}">confirm</a>`,paypalOrder.customer.email, "Confirm Payment" )
     res.send({message: "We sent you an email", mail: result});
 }
@@ -96,7 +112,7 @@ const capturePaypalOrder = async (req, res) => {
     let {payments: {captures}} = unit;
     let purchase = captures[0];
     console.log(purchase);
-    const {itemId, itemType,customer: {name, email, password}} = await PaypalOrder.findByIdAndDelete(purchase.custom_id);
+    const {itemId, itemType,customer: {name, email, password}, hasAffiliateCoupon, affiliateCoupon} = await PaypalOrder.findByIdAndDelete(purchase.custom_id);
     let item;
     let courses = [];
     let subcourses = []
@@ -109,7 +125,7 @@ const capturePaypalOrder = async (req, res) => {
         subcourses.push(item.id);
     }
     else throw new AppError(1, 404, "No item found with that name")
-
+    
 
     let user = await User.findOne({ email });
     if (!user) {
@@ -136,6 +152,9 @@ const capturePaypalOrder = async (req, res) => {
             })
         }
     }
+    if(hasAffiliateCoupon){
+        let sentPayment = await sendPayment(affiliateCoupon.receiver, affiliateCoupon.amountInEur);
+    }
     return res.redirect(clientUrl);
 }
 
@@ -145,6 +164,8 @@ const createPaymentIntent = async(req, res) =>{
     
     let user;
     let customer;
+    let receiver; 
+
     if (!req.session.userEmail) password = await register(name, email, password);
     else {
         user = await User.findOne({ email: req.session.userEmail });
@@ -163,14 +184,17 @@ const createPaymentIntent = async(req, res) =>{
     
     let price = item.price;
     if (couponId) {
-        const { coupon, total } = await checkCoupon(itemId, couponId);
+        const { total, isAffiliateCoupon } = await checkCoupon(itemId, couponId);
+        console.log({total, isAffiliateCoupon});
+        if (isAffiliateCoupon) receiver = await User.findById(couponId);
+        console.log({ total })
         price = total;
     }
     // todo save payment method to customer
     const paymentMethod =  await getPaymentMethod(paymentMethodId);
     paymentMethod.customer = customer.id;
-    console.log({paymentMethod});
-    const paymentIntent = await createStripePayment(paymentMethodId, customer.id, price, itemId, itemType);
+    console.log({paymentMethod, receiver});
+    const paymentIntent = await createStripePayment(paymentMethodId, customer.id, price, itemId, itemType, receiver?.paypalId);
     sendMail(`Confirm Payment: <a href="${baseUrl}/confirm-payment-intent/${paymentIntent.id}">confirm</a>`, email, "Confirm Payment")
     return res.send({ message: "We sent you an email" });
 }
@@ -181,7 +205,8 @@ const confirmPaymentIntent = async (req, res) =>{
     const paymentIntent = await getStripePayment(id);
     const { id: stripeId, email, name, metadata: {password, logged}} = await getStripeCustomer(paymentIntent.customer);
     if(!password) throw new AppError(1, 500, "Passoword: " + password)
-    const {itemId, itemType} = paymentIntent.metadata;
+    const {itemId, itemType, receiver} = paymentIntent.metadata;
+    console.log(paymentIntent.metadata)
     let item;
     let courses = [];
     let subcourses = []
@@ -220,19 +245,18 @@ const confirmPaymentIntent = async (req, res) =>{
             })
         }
     }
-
+    console.log("should i pay receiver? ", {receiver})
+    if(receiver){
+        console.log("yes pay him! ")
+        let sentPayment = await sendPayment(receiver, (item.price / 100 * 10 /* <--- percentage */) / 100 /* to EUR (paypal required)*/,)
+    }
     
     const confirmedPayment = await confirmStripePayment(id);
     console.log("confirmedpayment", confirmedPayment);
-    console.log("redirecting...", clientUrl)
+    console.log("redirecting...", clientUrl);
     return res.redirect(clientUrl);
 }
 
-const pay = async (req, res)=>{
-    const user = req.user;
-    console.log("hello world", user.paypalId)
-    sendPayment(user.paypalId, 100)
-}
 module.exports = {
     validateCredentials,
     validateCoupon,
@@ -240,6 +264,5 @@ module.exports = {
     confirmPaymentIntent,
     capturePaypalOrder,
     approvePaypalOrder,
-    createPaypalOrder,
-    pay
+    createPaypalOrder
 }

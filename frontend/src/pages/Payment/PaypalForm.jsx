@@ -3,6 +3,7 @@ import { useState } from "react";
 import { baseUrl } from "../../App";
 import Message from "../../components/Message";
 const PaypalForm = ({itemId, itemType, credentials, couponId}) =>{
+    console.log("on paypal", {couponId})
     const [message, setMessage] = useState();
     const createOrder = async(data, actions)=>{
         console.log({credentials}, this)
@@ -56,7 +57,7 @@ const PaypalForm = ({itemId, itemType, credentials, couponId}) =>{
         <>
     <div id="paypal-button">
     <PayPalButtons
-            forceReRender={[credentials]} 
+            forceReRender={[credentials,couponId]} 
             style={{
                 layout: "horizontal",
                 color: "gold",

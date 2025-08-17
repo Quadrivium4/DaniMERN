@@ -5,3 +5,33 @@
     --extra-light: rgb(80, 96, 136);
     --primary: rgb(33, 50, 100);
 }
+* {
+    margin: 0;
+    padding: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: none;
+    background-color: transparent
+}
+
+body,
+input,
+select {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%
+}
+
+input.autofill-field {
+    width: 2px;
+    z-index: -1;
+    left: -2px;
+    opacity: 0
+}
+
+:focus {
+    outline: 0
+}

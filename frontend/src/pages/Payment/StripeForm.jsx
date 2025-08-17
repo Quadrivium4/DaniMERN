@@ -48,16 +48,26 @@ export default function CheckoutForm({itemId, itemType, credentials, couponId}) 
 
 
         setIsLoading(true);
+        console.log("submitted");
         let {error, paymentMethod} = await stripe.createPaymentMethod({
             type: 'card',
             card: elements.getElement(CardElement)
         });
-        let {errorCard, card} = await stripe.createToken()
+        
         if(error){
+            console.log("error card", error)
             setIsLoading(false);
             return setMessage({type: "error", content: error.message})
         }
-
+        console.log("payment method", {paymentMethod});
+        /*let {errorCard, card} = await stripe.createToken();
+        if(errorCard){
+            console.log("error card", errorCard)
+            setIsLoading(false);
+            return setMessage({type: "error", content: error.message})
+        }
+        console.log("card", {card});*/
+        console.log("fetching payment intent");
         fetch(baseUrl + "/create-payment-intent", {
             method: "POST",
             withCredentials: true,
@@ -71,6 +81,7 @@ export default function CheckoutForm({itemId, itemType, credentials, couponId}) 
             const response = await res.json();
             throw new Error(response.message);
         }).then(async(res)=>{
+            console.log({res})
             setMessage({type: "success", content: res.message})
             console.log(res);
         }).catch(err=>{

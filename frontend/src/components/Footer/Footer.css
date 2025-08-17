@@ -1,5 +1,14 @@
 @import "../../root.css";
 #footer {
     padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: var(--dark);
+}
+#contact {
+    width: 600px;
+    display: flex;
+    flex-direction: row;
+   justify-content: space-around;
 }

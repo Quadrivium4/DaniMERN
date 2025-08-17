@@ -17,9 +17,12 @@
     display: flex;
     flex-direction: column;
 }
+#checkout .course-info{
+    align-items: center;
+}
 #checkout .course-info img{
     width: 100%;
-    max-width: 300px;
+    max-width: 400px;
 }
 #checkout .data .register {
     display: flex;
@@ -74,4 +77,9 @@
 }
 #checkout .payment #stripe-form button {
     margin-bottom: 10px;
+}
+#checkout .coupon{
+    padding: 20px 0px;
+    align-items: center;
+    gap: 5px
 }

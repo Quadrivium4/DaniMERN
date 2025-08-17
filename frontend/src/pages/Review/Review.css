@@ -1,3 +1,7 @@
 #review {
     flex-direction: column;
 }
+#review #form{
+    height: 500px;
+    overflow-y: scroll;
+}

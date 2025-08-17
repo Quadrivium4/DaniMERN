@@ -7,6 +7,7 @@ import {
     postReview
 } from "../../admin";
 import "./Review.css"
+import Scroller from "../../components/Scroller/Scroller";
 
 const Review = () => {
     console.log("hi")
@@ -82,29 +83,50 @@ const PdfForm = ({id, previewImg}) =>{
     return (
         <>
             <h1>Pdf Form</h1>
-            {fields.map((field, i )=>{
-                return (
-                    <div className="field" key={i}>
-                        <h3>{field.name}</h3>
-                        <input type="number" value={field.rate} max={5} 
-                        onChange={(e)=>{
-                                const newFields = [...fields];
-                                newFields[i].rate = e.target.value
-                                setFields(newFields) 
-                            }
-                        }/>
-                    </div>
-                    )
-            })}
-            <h3>Minimim Price</h3>
-            <input type="number" value={priceRange.min} onChange={(e)=>setPriceRange({...priceRange, min: e.target.value})}></input>
-            <h3>Maximum Price</h3>
-            <input type="number"value={priceRange.max}  onChange={(e)=>setPriceRange({...priceRange,max: e.target.value})}></input>
-            <h3>Comment</h3>
-            <textarea value={comment} onChange={(e)=>setComment(e.target.value)}></textarea>
+            <div id="form">
+                {fields.map((field, i) => {
+                    return (
+                        <div className="field" key={i}>
+                            <h3>{field.name}</h3>
+                            <input
+                                type="number"
+                                value={field.rate}
+                                max={5}
+                                onChange={(e) => {
+                                    const newFields = [...fields];
+                                    newFields[i].rate = e.target.value;
+                                    setFields(newFields);
+                                }}
+                            />
+                        </div>
+                    );
+                })}
+
+                <h3>Minimim Price</h3>
+                <input
+                    type="number"
+                    value={priceRange.min}
+                    onChange={(e) =>
+                        setPriceRange({ ...priceRange, min: e.target.value })
+                    }
+                ></input>
+                <h3>Maximum Price</h3>
+                <input
+                    type="number"
+                    value={priceRange.max}
+                    onChange={(e) =>
+                        setPriceRange({ ...priceRange, max: e.target.value })
+                    }
+                ></input>
+                <h3>Comment</h3>
+                <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                ></textarea>
+            </div>
             <button onClick={sendPdf}>Send</button>
         </>
-    )
+    );
 }
 const PdfFormField = () =>{
 

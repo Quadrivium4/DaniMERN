@@ -41,7 +41,6 @@ app.use(cors({
     methods: ["POST", "PUT", "GET","DELETE", "OPTIONS", "HEAD"],
     credentials: true
 }))
-app.use("/assets", express.static("./public"))
 app.use(session({
     secret: process.env.SECRET,
     cookie: {
@@ -59,7 +58,7 @@ app.use(session({
     })
 }))
 app.use("/protected", protectedRouter);
-app.use(publicRouter);
+app.use("/", publicRouter);
 
 const main = async () => {
     try {

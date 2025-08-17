@@ -99,8 +99,8 @@ async function generateAccessToken() {
     //console.log({data})
     return data.access_token;
 }
-const sendPayment = async(paypalId, amount)=>{
-    console.log("sending payment...", paypalId, amount)
+const sendPayment = async(paypalId, amountInEur)=>{
+    console.log("sending payment...", paypalId, amountInEur)
     const accessToken = await generateAccessToken();
     console.log(`Bearer ${accessToken}`)
     const url = `${baseURL}/v1/payments/payouts`;
@@ -116,7 +116,7 @@ const sendPayment = async(paypalId, amount)=>{
                     receiver: paypalId,
                     amount: {
                         currency: "EUR",
-                        value: amount
+                        value: amountInEur
                     },
                     recipient_type: "PAYPAL_ID",
                     note: "Thanks for your patronage!",

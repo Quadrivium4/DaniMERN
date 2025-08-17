@@ -17,7 +17,9 @@ const {createDiscount, getDiscount, getDiscounts, deleteDiscount, updateDiscount
 
 
 
-
+publicRouter.get("/", (req, res) =>{
+    res.send("hello")
+})
 publicRouter.get("/files/:id", tryCatch(downloadFile))
 
 protectedRouter.use(tryCatch(verifyUser));
@@ -26,7 +28,7 @@ protectedRouter.route("/subcourse")
     .get(tryCatch(getSubcourses))
     .post(tryCatch(postSubcourse))
     .put(tryCatch(putSubcourse))
-protectedRouter.route("/pay").get(tryCatch(pay))
+//protectedRouter.route("/pay").get(tryCatch(pay))
 protectedRouter.route("/course")
     .get(tryCatch(getCourses))
     .post(tryCatch(postCourse))

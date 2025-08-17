@@ -154,14 +154,11 @@ const getUser = async (req, res) => {
 }
 const registerConfirmation = async (req, res) => {
     const { userId, token } = req.params;
-    const user = await UnverifiedUser.findOne({ _id: userId });
-    console.log({user, userId, token})
-    if (!user) return res.status(400).send({ ok: false, message: "invalid link" });
     const unverifiedUser = await UnverifiedUser.findOne({
         _id: userId,
         token: token
     });
-    if (token) {
+    if (unverifiedUser) {
         const verifiedUser = await User.create({
             name: unverifiedUser.name,
             email: unverifiedUser.email,

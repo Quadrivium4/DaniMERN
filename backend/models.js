@@ -116,6 +116,11 @@ const PaypalOrderSchema  = new mongoose.Schema({
         },
     },
     amount: Number,
+    hasAffiliateCoupon: Boolean,
+    affiliateCoupon: {
+        receiver: String,
+        amountInEur: Number
+    },
     orderId: String,
     itemId: String,
     itemType: String

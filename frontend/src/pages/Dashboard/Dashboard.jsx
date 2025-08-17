@@ -9,6 +9,8 @@ import uploadIcon from '../../assets/icons/carica.png';
 import accountImg from "../../assets/images/account-picture.png"
 import "./Dashboard.css"
 import { crossing } from "../../utils";
+import CopyField from "./components/CopyField";
+import Message from "../../components/Message";
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -22,6 +24,7 @@ const Dashboard = () => {
     const videoPreview = useRef(null);
     const profileImgPreview = useRef(null);
     const dispatch = useUserDispatch();
+
     //console.log("USER: ", info, courses, subcourses)
     useEffect(()=>{
         if(!reviews){
@@ -104,7 +107,7 @@ const Dashboard = () => {
     }
     return (
         <div id="dashboard" className="page">
-            
+        
             <div id="reviews" className="section">
                 <h1>valutazioni</h1>
                 <div id="post-review" className="sub-section">
@@ -136,7 +139,7 @@ const Dashboard = () => {
                                 <div className="review" key={review._id}>
                                     <h3>{review.video.name}</h3>
                                     <p>completed: {""+review.completed}</p>
-                                    {review.completed? <a target="_blank" href={assetsUrl+ "/"+ info._id + "/" + review.pdf}>pdf</a>: null}
+                                    {review.completed? <a target="_blank" href={assetsUrl+ "/"+ review.pdf}>pdf</a>: null}
                                     <button onClick={()=>{
                                         const newReviews = reviews.filter(item=> item._id !== review._id);
                                         console.log(newReviews)
@@ -199,7 +202,10 @@ const Dashboard = () => {
                     </div>
                     
                 </div>
-                <button onClick={()=>crossing(protectedUrl + "/pay")}>pay</button>
+                <h2>Affilate</h2>
+                { info.paypalId ? <p>Affiliate coupon:</p> : <p>You must have an account PayPal connected</p>}
+                { info.paypalId ? <CopyField textToCopy={info._id} />: null }
+                
             </div>
             <div id="purchases" className="section">
                 <h1>Aquisti</h1>

@@ -48,6 +48,8 @@ h1 {
     margin-bottom: 10px;
 }
 a{
+    all: unset;
+    cursor: pointer;
     display: contents;
 }
 button {
@@ -112,9 +114,7 @@ input:disabled{
     width: 100%;
     background: var(--medium);
 }
-.link{
-    color: blue;
-}
+
 .layer{
     z-index: 1;
     width: 100%;

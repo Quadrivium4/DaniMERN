@@ -24,26 +24,38 @@ const Store = () => {
     },[])
     return (
         <div id="store" className="page">
-            
             <div id="products">
-                {store? store.map(course=>{
-                    return (
-                        <Link to={"/product"} state={course}>
-                        <div key={course.id} className="product">
-                        <img className="course-img" alt="course-img" src={getFile(course.coverImg)} />
-                            <h2>{course.name}</h2>
-                            <h2 id="price">€{(course.price/100).toFixed(2)}</h2>
-                        <div id="layer"></div>
-                            
-                            
-                        </div>
-                        </Link>
-                        )
-                }): <p>loading</p>}
-                
+                {store ? (
+                    store.map((course) => {
+                        console.log(course);
+                        return (
+                            <Link to={"/product"} state={course}>
+                                <div key={course.id} className="product">
+                                    <div className="cover">
+                                        <img
+                                            className="course-img"
+                                            alt="course-img"
+                                            src={getFile(course.coverImg)}
+                                        />
+                                        <h2>{course.name}</h2>
+                                        <h2 id="price">
+                                            €{(course.price / 100).toFixed(2)}
+                                        </h2>
+                                        <div id="layer"></div>
+                                    </div>
+                                    <div className="details">
+                                        <p>{course.description}</p>
+                                    </div>
+                                </div>
+                            </Link>
+                        );
+                    })
+                ) : (
+                    <p>loading</p>
+                )}
             </div>
             {/*store? <img src="https://res.cloudinary.com/dkbe7c8we/image/upload/v1679289542/olympic_flag.jpg" alt="" />: <p>loading 2</p>*/}
         </div>
-    )
+    );
 }
 export default Store

@@ -19,6 +19,7 @@ const getFile = async(id)=>{
 }
 
 const downloadFile = async(req, res) =>{
+    console.log({params: req.params})
     let id = req.params.id;
     if (!ObjectId.isValid(id)) throw new AppError(1, 404, "invalid id");
     let stream = await bucket.actions.openDownloadStream(new ObjectId(id));
