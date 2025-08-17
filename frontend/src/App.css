@@ -114,7 +114,6 @@ input:disabled{
     width: 100%;
     background: var(--medium);
 }
-
 .layer{
     z-index: 1;
     width: 100%;

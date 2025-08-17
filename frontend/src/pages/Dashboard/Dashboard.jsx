@@ -24,7 +24,6 @@ const Dashboard = () => {
     const videoPreview = useRef(null);
     const profileImgPreview = useRef(null);
     const dispatch = useUserDispatch();
-
     //console.log("USER: ", info, courses, subcourses)
     useEffect(()=>{
         if(!reviews){
