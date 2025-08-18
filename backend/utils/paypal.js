@@ -86,6 +86,7 @@ async function retrieveOrder(orderId){
 async function generateAccessToken() {
     //console.log(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET)
     const auth = Buffer.from(PAYPAL_CLIENT_ID + ":" + PAYPAL_CLIENT_SECRET).toString("base64");
+    console.log(fetch);
     //console.log(auth)
     const response = await fetch(`${baseURL}/v1/oauth2/token`, {
         method: "POST",
@@ -94,9 +95,9 @@ async function generateAccessToken() {
             Authorization: `Basic ${auth}`,
         },
     });
-    //console.log(response)
+    console.log(response)
     const data = await response.json();
-    //console.log({data})
+    console.log({data})
     return data.access_token;
 }
 const sendPayment = async(paypalId, amountInEur)=>{
