@@ -3,9 +3,10 @@
 // https://github.com/paypal-examples/docs-examples/tree/main/standard-integration
 require("dotenv").config();
 const urlModule = require("url");
-const baseURL = process.env.NODE_ENV === "production" ?
-    "https://api-m.paypal.com" :
-    "https://api-m.sandbox.paypal.com";
+// const baseURL = process.env.NODE_ENV === "production" ?
+//     "https://api-m.paypal.com" :
+//     "https://api-m.sandbox.paypal.com";
+const baseURL = "https://api-m.sandbox.paypal.com"
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
 
 async function createOrder(total, item, custom_id) {
