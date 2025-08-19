@@ -3,6 +3,7 @@ const {bucket} = require("../db");
 const {Readable} = require("stream");
 const { ObjectId } = require("mongodb");
 const saveFile = async(file)=>{
+    console.log(file.data);
     let stream = Readable.from(file.data);
     let result = stream.pipe(bucket.actions.openUploadStream(file.name));
     console.log(result.id)
