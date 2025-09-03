@@ -8,6 +8,6 @@
 }
 #view  .videos .video{
     background-color: rgb(255, 187, 0);
-    max-width: 50%;
     min-width: 300px;
+    max-width: 1200px;
 }

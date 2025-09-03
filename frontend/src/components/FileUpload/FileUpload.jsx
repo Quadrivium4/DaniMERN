@@ -2,14 +2,14 @@ import { useEffect, useRef } from "react";
 import { downloadFile, getImageFromUserVideo, getSrcFromUserFile } from "../../utils";
 
 
-const FileUpload = ({setFile, defaultFileSrc, imgPreview, type, children}) =>{
+const FileUpload = ({setFile, defaultFileSrc, filePreview, type, children}) =>{
     const input = useRef(null);
     useEffect(()=>{
         if(typeof defaultFileSrc == "string"){
         downloadFile(defaultFileSrc).then(file =>{
-            console.log(file,imgPreview.current)
+            console.log(file,filePreview.current)
             setFile(file);
-            imgPreview.current.src = defaultFileSrc;
+            filePreview.current.src = defaultFileSrc;
         })
     } 
     },[])
@@ -20,15 +20,20 @@ const FileUpload = ({setFile, defaultFileSrc, imgPreview, type, children}) =>{
                     const file = e.target.files[0];
                     if(!file) return;
                     setFile(file);
-                    console.log(file)
-                    if(/image/.test(file.type)){
+                    console.log(file);
+                    
+                    if(/image/.test(file.type) && filePreview){
                         getSrcFromUserFile(file).then(src=>{
-                            imgPreview.current.src = src
+                            filePreview.current.src = src
                         })
-                    }else if(/video/.test(file.type)){
+                    }else if(/video/.test(file.type) && filePreview){
                         getImageFromUserVideo(file).then(src=>{
-                            imgPreview.current.src = src
+                            filePreview.current.src = src
                         })
+                    }else if(/pdf/.test(file.type) && filePreview){
+                        getSrcFromUserFile(file).then((src) => {
+                            filePreview.current.src = src;
+                        });
                     }
                     
                     

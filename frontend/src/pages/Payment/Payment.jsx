@@ -9,7 +9,7 @@ import { useUser, useUserDispatch } from "../../Context";
 import Message from "../../components/Message";
 import Pop from "../../components/Pop";
 import Login from "../../components/Login";
-import { getFile, logout } from "../../controllers";
+import { logout } from "../../controllers";
 import { PayPalScriptProvider} from "@paypal/react-paypal-js";
 import "./Payment.css"
 import creditCards from "../../assets/icons/credit-cards.png";
@@ -64,7 +64,7 @@ function Payment(){
                     <>
                         <div className="details">
                             <img
-                                src={getFile(item.coverImg)}
+                                src={item.coverImg}
                                 alt={item.description}
                             ></img>
                             <div>

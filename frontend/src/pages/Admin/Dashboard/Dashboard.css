@@ -1,0 +1,77 @@
+@import "../../../root.css";
+
+#admin {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    width: 100%;
+}
+
+#admin section {
+    flex: 1 1 0;
+}
+
+#admin #reviews .container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 10px;
+
+}
+
+#admin #reviews .review {
+    padding: 10px;
+    border: 1px solid var(--light);
+
+}
+
+#admin .img-preview {
+    width: 100px;
+}
+
+#admin .product {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px;
+    gap: 10px;
+
+}
+
+#admin .product .cover {
+
+    background-color: var();
+    border: 1px solid var(--light);
+    overflow-wrap: break-word;
+
+}
+
+#admin .product .title {
+    padding: 5px;
+    text-align: center;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+#admin .product img {
+    width: 100%;
+    max-width: 200px;
+
+}
+
+#admin .product .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+#admin section {
+    width: 100%;
+}
+
+#admin .scroller {
+    background-color: var(--dark);
+    height: 50%;
+    min-width: 310px;
+}

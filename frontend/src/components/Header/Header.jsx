@@ -8,7 +8,6 @@ import headerImg from "../../assets/images/header.jpg";
 import logoImg from "../../assets/images/logo.png";
 import "./Header.css";
 import { useUser, useUserDispatch } from "../../Context";
-import { getFile } from "../../controllers";
 import AdminIcon from "../../assets/images/admin.png"
 
 const Header = () => {
@@ -31,7 +30,7 @@ const Header = () => {
             {isLogged? 
                     <Link to="/dashboard">
                         {info?.profileImg ? 
-                            <img alt="account-img" className="account-img" src={info.role === "admin"? AdminIcon: getFile(info.profileImg)} />
+                            <img alt="account-img" className="account-img" src={info.role === "admin"? AdminIcon: info.profileImg} />
                             :
                             <img alt="account-img" className="account-img" src={accountImg} />
                         }

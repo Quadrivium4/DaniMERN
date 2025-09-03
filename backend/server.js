@@ -1,4 +1,7 @@
+
+
 require("dotenv").config();
+
 require("./globals")
 const express = require("express");
 const session = require("express-session");
@@ -6,7 +9,6 @@ const cors = require("cors");
 const MongoStore = require("connect-mongo");
 const bodyParser = require("body-parser");
 const crypto  = require("crypto");
-const fileUpload = require("express-fileupload");
 
 const app = express();
 const port = process.env.PORT || 1234;
@@ -14,6 +16,7 @@ const {connectDB} = require("./db")
 const {publicRouter, protectedRouter} = require("./routes");
 const errorHandler = require("./middlewares/errorHandler");
 const IS_PRODUCTION = process.env.NODE_ENV === "production"? true: false;
+const fileUpload = require("express-fileupload");
 
 
 app.use(bodyParser.json({

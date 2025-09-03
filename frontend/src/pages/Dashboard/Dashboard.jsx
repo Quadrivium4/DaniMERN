@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef} from "react"
 import { Link, useNavigate } from "react-router-dom";
 import { useUser, useUserDispatch } from "../../Context";
-import { logout, getCourses, getSubcourses, getReviews, deleteReview, deleteUser, getFile } from "../../controllers";
+import { logout, getCourses, getSubcourses, getReviews, deleteReview, deleteUser } from "../../controllers";
 import { assetsUrl, baseUrl, protectedUrl } from "../../App";
 import FileUpload from "../../components/FileUpload/FileUpload";
 import ProgressBar from "../../components/ProgressBar/ProgressBar";
@@ -50,21 +50,41 @@ const Dashboard = () => {
             console.log("courses and sub", courses, subcourses)
         }
     },[])
-    const uploadImage = (img) =>{
-        const formData = new FormData()
-        formData.append('file', img)
-        formData.append("type", "video")
-        fetch( protectedUrl+ '/user/upload', {
-            withCredentials: true,
-            credentials: "include",
-            method: 'POST',
-            body: formData,
-        }).then((res) => res.json()).then(({fileId})=>{
-            console.log(fileId)
-            const newUser = {...info, profileImg: fileId};
-            dispatch({type: "SET_INFO", value: newUser});
-        })
-    }
+    // const uploadImage = (img) =>{
+    //     const reader = new FileReader();
+    //     const formData = new FormData();
+    //     //const result = reader.readAsDataURL(img);
+    //     console.log(img);
+    //     formData.append('file', img)
+    //     formData.append("type", "video");
+    //     fetch( protectedUrl+ '/user/upload', {
+    //         withCredentials: true,
+    //         credentials: "include",
+    //         method: 'POST',
+    //         body: formData,
+    //     }).then((res) => res.json()).then(({fileId})=>{
+    //         console.log(fileId)
+    //         const newUser = {...info, profileImg: fileId};
+    //         dispatch({type: "SET_INFO", value: newUser});
+    //     })
+    // }
+     const uploadImage = (img) => {
+         const formData = new FormData();
+         formData.append("file", img);
+         formData.append("type", "video");
+         fetch(protectedUrl + "/user/upload", {
+             withCredentials: true,
+             credentials: "include",
+             method: "POST",
+             body: formData,
+         })
+             .then((res) => res.json())
+             .then(({ fileId }) => {
+                 console.log(fileId);
+                 const newUser = { ...info, profileImg: fileId };
+                 dispatch({ type: "SET_INFO", value: newUser });
+             });
+     };
     const uploadVideo = () =>{
         if(!video){
             return setVideo(false)
@@ -165,7 +185,7 @@ const Dashboard = () => {
                     <FileUpload setFile={uploadImage} imgPreview={profileImgPreview} >
                         {
                             info.profileImg?
-                            <img ref={profileImgPreview} src={getFile(info.profileImg)} alt="profile img"></img> :
+                            <img ref={profileImgPreview} src={info.profileImg} alt="profile img"></img> :
                             <img ref={profileImgPreview} src={accountImg} alt="profile img"></img>
                         }
                     </FileUpload>
@@ -214,9 +234,9 @@ const Dashboard = () => {
                         {status === "loading"? <p>loading</p> : courses?.map(course=>{
                             
                             return (
-                                <Link to="/view" state={{type: "course", id: course._id }} key={course._id}>
+                                <Link to="/view" state={{type: "course", course: course }} key={course._id}>
                                     <div className="course" >
-                                        <img src={getFile(course.coverImg)} alt="" />
+                                        <img src={course.coverImg} alt="" />
                                         <h3 className="title">{course.name}</h3>
                                     </div>
                                 </Link>
@@ -229,9 +249,9 @@ const Dashboard = () => {
                     <div className="scroller">
                         {status === "loading"? <p>loading</p> : subcourses?.map(subcourse=>{
                             return (
-                                <Link to="/view" state={{type: "subcourse", id: subcourse._id }} key={subcourse._id}>
+                                <Link to={"/view/" + subcourse._id} state={{type: "subcourse", course: subcourse }}  key={subcourse._id}>
                                     <div className="subcourse" >
-                                        <img src={getFile(subcourse.coverImg)} alt="" />
+                                        <img src={subcourse.coverImg} alt="" />
                                         <h3 className="title">{subcourse.name}</h3>
                                     </div>
                                 </Link>

@@ -9,6 +9,12 @@ const postCourse = async(course) =>{
 const postSubcourse = async(subcourse)=>{
     return await sendForm(protectedUrl + "/subcourse", "POST", subcourse);
 }
+const uploadSubcourseFiles = async(formData) =>{
+    return await sendForm(protectedUrl + "/upload-subcourse-files", "POST", formData);
+}
+const deleteSubcourseFiles = async (data) => {
+    return await crossing(protectedUrl + "/upload-subcourse-files", "DELETE", data);
+}
 const updateCourse = async(course) =>{
     return await sendForm(protectedUrl + "/course", "PUT", course);
 }
@@ -44,6 +50,8 @@ export {
     postSubcourse,
     updateCourse,
     updateSubcourse,
+    uploadSubcourseFiles,
+    deleteSubcourseFiles,
     deleteCourse,
     deleteSubcourse,
     postDiscount,

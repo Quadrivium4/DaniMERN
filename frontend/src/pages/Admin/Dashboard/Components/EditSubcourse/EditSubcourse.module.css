@@ -1,0 +1,74 @@
+@import "../../../../../root.css";
+.page {
+    flex-direction: column;
+    display: flex;
+    overflow: auto;
+}
+.sections {
+    display: flex;
+}
+
+.videoSction {
+
+
+}
+.videoItems{
+    padding: 5px;
+}
+.videoItem{
+}
+.videoFiles{
+    display: flex;
+    gap: 2px;
+    max-width: 400px;
+    overflow: auto;
+}
+.moveable {
+    cursor: grab;
+    background-color: red;
+}
+.draggable {
+    cursor: grab;
+    background-color: var(--light);
+    padding: 20px;
+}
+.img {
+    max-width: 300px;
+}
+.file {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--dark);
+}
+.file:hover .overlay {
+    display: flex;
+    
+}
+.file:hover .closeIcon{
+    display: flex;
+    cursor: pointer;
+}
+.overlay {
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.425);
+}
+.closeIcon{
+    position: absolute;
+    right: 0;
+    display: none;
+
+}
+
+.fileName{
+    padding: 5px;
+}
+.obj{
+   width: 100%;
+   height: 50px;
+   object-fit: cover;
+}
