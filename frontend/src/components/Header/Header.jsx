@@ -47,4 +47,53 @@ const Header = () => {
         </div>
     )
 }
-export default Header
+
+
+const Header1 = () => {
+    const { isLogged, info } = useUser();
+    console.log("header", { info });
+    const [loginPop, setLoginPop] = useState(false);
+    const handleLoginPop = () => {
+        setLoginPop(!loginPop);
+    };
+
+    return (
+        <div id="header">
+                <h1>Maxen Academy</h1>
+                {isLogged ? (
+                    <Link to="/dashboard">
+                        {info?.profileImg.url ? (
+                            <img
+                                alt="account-img"
+                                className="account-img"
+                                src={
+                                    info.role === "admin"
+                                        ? AdminIcon
+                                        : info.profileImg.url
+                                }
+                            />
+                        ) : (
+                            <img
+                                alt="account-img"
+                                className="account-img"
+                                src={accountImg}
+                            />
+                        )}
+                    </Link>
+                ) : (
+                    <img
+                        onClick={handleLoginPop}
+                        alt="account-img"
+                        className="account-img"
+                        src={accountImg}
+                    />
+                )}
+                {loginPop ? (
+                    <Pop toggle={handleLoginPop}>
+                        <Login toggle={handleLoginPop} />
+                    </Pop>
+                ) : null}
+        </div>
+    );
+};
+export default Header1

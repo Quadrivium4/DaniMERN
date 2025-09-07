@@ -2,45 +2,71 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { getSubcourse } from "../../../../../controllers";
-import { deleteSubcourseFiles, postSubcourse, updateSubcourse, uploadSubcourseFiles } from "../../../../../admin";
-import FileUpload from "../../../../../components/FileUpload/FileUpload";
+import { deleteSubcourseFiles, postSubcourse, updateSubcourse, uploadSubcourseCover, uploadSubcourseFiles } from "../../../../../admin";
+import FileUpload from "../../../../../components/FileUpload/FileUpload.tsx";
 import styles from "./EditSubcourse.module.css"
 import Draggable from "react-draggable";
 import Moveable from "react-moveable";
 import Transformable from "../../../../../components/Transformable/Transformable";
 import {IoMdClose} from "react-icons/io"
 import { getSrcFromUserFile } from "../../../../../utils";
-type TSubcourse = {
-    name: String,
-    description: String,
-    price: Number,
-    hashedId: String,
+export type TSubcourse = {
+    name: string,
+    description: string,
+    price: number,
+    hashedId: string,
     coverImg: TImage,
     files: TFile[],
-    id: String
+    id: string
 }
-type TSubcourseVideos = {
+export type TSubcourseVideos = {
     [section: string]: {
         [videoId: string] : TVideo;
     }
 }
-type TVideo = {
-    hashed_id: String,
-    name: String,
-    files: TFile[]
+export type TVideo = {
+    hashed_id: string,
+    name: string,
+    files: TFile[],
+    section?: string
 }
-type TImage ={
-    url: String,
-    public_id: String,
-    name: String
+export type TImage ={
+    url: string,
+    public_id: string,
+    name: string
 }
-type TFile = {
-    url: String,
-    public_id: String,
-    name: String
+export type TFile = {
+    url: string,
+    public_id: string,
+    name: string
+}
+export const createSubcourseVideos = (files: TFile[], medias: TVideo[]) =>{
+    let newSubcourseVideos : TSubcourseVideos = { main: {} };
+    let videoFiles;
+    for (let i = 0; i < medias.length; i++) {
+        const video = medias[i];
+        if(files){
+            videoFiles = files[video.hashed_id];
+            
+        }
+        video.files = videoFiles || [];
+        if(!video.section){
+            newSubcourseVideos.main[video.hashed_id] = video;
+        }else if(video.section && newSubcourseVideos.hasOwnProperty(video.section)){
+            newSubcourseVideos[video.section][video.hashed_id] = video;
+        }else if(video.section && !newSubcourseVideos.hasOwnProperty(video.section)){
+            newSubcourseVideos[video.section] = {
+                [video.hashed_id]: video
+            }
+        }
+       
+        
+    }
+     console.log({newSubcourseVideos})
+    return newSubcourseVideos;
 }
 export const EditSubcourse = () =>{
-    const { subcourse, action} = useLocation().state;
+    const { subcourse, action} = useLocation().state //as {subcourse: TSubcourse, action: "create" | "update"};
     const refMoveable = useRef(null);
     const [moveTarget, setMoveTarget] = useState(null);
     const imgPreview = useRef(null)
@@ -69,27 +95,8 @@ export const EditSubcourse = () =>{
         getSubcourse(subcourse._id).then(({data})=>{
             console.log(data);
             
-            let newSubcourseVideos : TSubcourseVideos = { main: {} };
-            let videoFiles;
-            for (let i = 0; i < data.medias.length; i++) {
-                const video = data.medias[i];
-                if(subcourse.files){
-                    videoFiles = data.files[video.hashed_id];
-                    
-                }
-                video.files = videoFiles || [];
-                if(!video.section){
-                    newSubcourseVideos.main[video.hashed_id] = video;
-                }else if(video.section && newSubcourseVideos.hasOwnProperty(video.section)){
-                    newSubcourseVideos[video.section][video.hashed_id] = video;
-                }else if(video.section && !newSubcourseVideos.hasOwnProperty(video.section)){
-                    newSubcourseVideos[video.section] = {
-                        [video.hashed_id]: video
-                    }
-                }
-                console.log({newSubcourseVideos})
-                setSubcourseVideos(newSubcourseVideos);
-            }
+            let newSubcourseVideos : TSubcourseVideos =createSubcourseVideos(subcourse.files, data.medias);
+            setSubcourseVideos(newSubcourseVideos);
             //console.log("subcourse data", res);
             //setSubcourseVideos(data.medias);
         });
@@ -121,15 +128,13 @@ export const EditSubcourse = () =>{
     }
     const handleEdit = async() =>{
         const form = new FormData();
-            
+        form.append("name", subcourseData.name);
+        form.append("description", subcourseData.description);
+        form.append("price", subcourseData.price.toString());
+        form.append("hashedId", subcourseData.hashedId);
             for(const [key, value] of Object.entries(subcourseData) ){
                 
-                if(key === "subcourses"){
-                    console.log("hi");
-                    form.append(key, JSON.stringify(value));
-                }else{
-                    form.append(key, value);
-                }
+              
                 console.log(key, value)
             }
         if(action === "update"){
@@ -175,21 +180,30 @@ export const EditSubcourse = () =>{
                         onChange={(e) =>
                             setSubcourseData({
                                 ...subcourseData,
-                                price: e.target.value,
+                                price: parseInt(e.target.value, 10),
                             })
                         }
                     />
                     <p>Course Cover</p>
                     <FileUpload
                         setFile={(file) => {
-                            setSubcourseData({
-                                ...subcourseData,
-                                coverImg: file,
+                            const formData = new FormData();
+                            formData.append("coverImg", file);
+                            console.log({file});
+                            uploadSubcourseCover(formData).then((data) => {
+                                setSubcourseData({
+                                    ...subcourseData,
+                                    coverImg: data.image,
+                                });
                             });
+                            // setSubcourseData({
+                            //     ...subcourseData,
+                            //     coverImg: file,
+                            // });
                         }}
-                        imgPreview={imgPreview}
+                        filePreview={imgPreview}
                         type="image"
-                        defaultFileSrc={subcourse.coverImg}
+                        defaultFileSrc={subcourse.coverImg.url}
                     >
                         <img
                             className={styles.img}
@@ -239,7 +253,7 @@ export const EditSubcourse = () =>{
     );
 }
 const VideoItem = ({video, section, updateFile, removeFile, subcourseId}) =>{
-    const [uploadingFile, setUploadingFile] = useState();
+    const [uploadingFile, setUploadingFile] = useState<{data: any, videoHashedId: string} | null>();
     const uploadFile = async (file, videoHashedId, section) => {
         const fileSrc = await getSrcFromUserFile(file);
         setUploadingFile({ data: fileSrc, videoHashedId });
@@ -262,6 +276,8 @@ const VideoItem = ({video, section, updateFile, removeFile, subcourseId}) =>{
             hashedId: videoHahsedId,
             public_id: file.public_id,
         });
+        removeFile(file, videoHahsedId, section);
+        console.log("File deleted successfully");
     }
     const id = video.hashed_id;
     return (
@@ -328,7 +344,9 @@ const VideoItem = ({video, section, updateFile, removeFile, subcourseId}) =>{
                 </object> : null}
                 
             </div>
-            <FileUpload setFile={(file) =>uploadFile(file, id, section)}>
+            <FileUpload
+            type={"file"}
+             setFile={(file) =>uploadFile(file, id, section)}>
                     <p>upload file</p>
                 </FileUpload>
         </div>

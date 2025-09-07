@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUser, useUserDispatch } from "../../Context";
 import { logout, getCourses, getSubcourses, getReviews, deleteReview, deleteUser } from "../../controllers";
 import { assetsUrl, baseUrl, protectedUrl } from "../../App";
-import FileUpload from "../../components/FileUpload/FileUpload";
+import FileUpload from "../../components/FileUpload/FileUpload.tsx";
 import ProgressBar from "../../components/ProgressBar/ProgressBar";
 import uploadIcon from '../../assets/icons/carica.png';
 import accountImg from "../../assets/images/account-picture.png"
@@ -184,8 +184,8 @@ const Dashboard = () => {
                 <div className="info">
                     <FileUpload setFile={uploadImage} imgPreview={profileImgPreview} >
                         {
-                            info.profileImg?
-                            <img ref={profileImgPreview} src={info.profileImg} alt="profile img"></img> :
+                            info.profileImg.url?
+                            <img ref={profileImgPreview} src={info.profileImg.url} alt="profile img"></img> :
                             <img ref={profileImgPreview} src={accountImg} alt="profile img"></img>
                         }
                     </FileUpload>
@@ -251,7 +251,7 @@ const Dashboard = () => {
                             return (
                                 <Link to={"/view/" + subcourse._id} state={{type: "subcourse", course: subcourse }}  key={subcourse._id}>
                                     <div className="subcourse" >
-                                        <img src={subcourse.coverImg} alt="" />
+                                        <img src={subcourse.coverImg.url} alt="" />
                                         <h3 className="title">{subcourse.name}</h3>
                                     </div>
                                 </Link>

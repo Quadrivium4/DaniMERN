@@ -2,17 +2,21 @@
 .skeletonContainer {
     width: 100%;
     display: flex;
+    position: relative;
     height: 100%;
     background-color: rgba(31, 40, 92, 0.356);
     aspect-ratio: 16 / 9;
+    overflow: hidden;
+    container-type: size;
 }
 .skeletonContainer .circle {
-    width: 0px;
+    width: 100px;
     height: 100%;
     opacity: 0;
     position: absolute;
     background-color: transparent;
-    box-shadow: 0 0 100px 5px var(--light);
+    background-image: radial-gradient( rgba(255, 255, 255, 0.034),transparent);
+    /* box-shadow: 0 0 100px 5px var(--light); */
     animation: skeletonSlide 0.7s infinite ease-in-out;
 }
 

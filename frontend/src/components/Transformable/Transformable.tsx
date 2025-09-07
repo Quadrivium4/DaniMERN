@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./Transformable.module.css"
+import { MdDragIndicator } from "react-icons/md";
+
 const near = 10;
 const resizePoint = {
     top: {
@@ -35,14 +37,14 @@ const resizePoint = {
         cursor: "nwse-resize",
     },
 };
-const Transformable = ({children, disableChildPointerEvents}) =>{
+const Transformable = ({children}) =>{
     const [size, setSize] = useState({x: 400, y: 300});
     const [position, setPosition] = useState({x: 0, y: 0});
     const [isDragging, setIsDragging] = useState(false);
     const [isResizing, setIsResizing] = useState(false);
-    const [isResizable, setIsResizable] = useState();
+    const [isResizable, setIsResizable] = useState<{point: string, cursor: string} | null>(null);
     const [listener, setListener] = useState();
-    const transformableRef = useRef();
+    const transformableRef = useRef<HTMLDivElement>(null);
     useEffect(()=>{
         window.addEventListener("mouseup", ()=>{
             //console.log("window mouse up")
@@ -50,15 +52,16 @@ const Transformable = ({children, disableChildPointerEvents}) =>{
         })
     })
     const handleMouseMove = useCallback((e) =>{
-        
+        if(!isDragging) setIsDragging(true);
         setPosition((prev) => ({
             x: prev.x + e.movementX,
             y: prev.y + e.movementY,
         }));
-    },[]);
+    },[isDragging]);
     const handleResize = useCallback((e) => {
         let x;
         let y;
+        if(!isResizable) return;
         //console.log("handle resize", {isResizable})
         if (isResizable.point === resizePoint.top.point) {
             setSize(prev => ({y: prev.y - e.movementY, x: prev.x}));
@@ -104,7 +107,8 @@ const Transformable = ({children, disableChildPointerEvents}) =>{
         // }));
     }, [isResizable]);
     const mouseMoveInTarget= (e)=>{
-        const rect = transformableRef.current.getBoundingClientRect();
+        const rect = transformableRef.current?.getBoundingClientRect();
+        if(!rect) return;
         if(e.clientX - rect.left < near && e.clientY - rect.top < near){
             //console.log("near top left corner ----")
             setIsResizable(resizePoint.topLeft);
@@ -154,7 +158,7 @@ const Transformable = ({children, disableChildPointerEvents}) =>{
             //console.log("right resize");
             setIsResizable(resizePoint.right);
         } else {
-            if (isResizable) setIsResizable(false);
+            if (isResizable) setIsResizable(null);
         }
     }
     const handleMouseDown = () =>{
@@ -181,6 +185,12 @@ const Transformable = ({children, disableChildPointerEvents}) =>{
          setIsDragging(false);
          setIsResizing(false);
      };
+     const handleResizeDown = () =>{
+        if(isResizable){
+            setIsResizing(true);
+            window.addEventListener("mousemove", handleResize, true)
+        }
+     }
     return (
         <div
             ref={transformableRef}
@@ -193,7 +203,7 @@ const Transformable = ({children, disableChildPointerEvents}) =>{
                     ? isResizable.cursor
                     : isDragging
                     ? "grabbing"
-                    : "grab",
+                    : "auto",
                 position: "absolute",
                 zIndex: 2,
             }}
@@ -203,12 +213,13 @@ const Transformable = ({children, disableChildPointerEvents}) =>{
             onMouseLeave={() => {
                 console.log("mouseLeav");
             }}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
+           onMouseDown={handleResizeDown}
+        
             onMouseMove={mouseMoveInTarget}
         >
             <div className={styles.childrenContainer} style={{pointerEvents: (isDragging || isResizing)? "none" : "auto", }}>
-                <p>he</p>
+                <div className={styles.grabber}><MdDragIndicator  onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp} size={24} ></MdDragIndicator> </div>
                 {children}
             </div>
         </div>

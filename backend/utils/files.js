@@ -12,7 +12,6 @@ cloudinary.config({
 })
 
 const saveFile = async(file)=>{
-<<<<<<< HEAD
     console.log("saving file.. " + file.name);
     const b64 = Buffer.from(file.data).toString("base64");
     let dataURI = "data:" + file.mimetype + ";base64," + b64;
@@ -39,13 +38,6 @@ const saveFiles = async(files)=>{
     const results = await Promise.all(promises);
     console.log({results});
     return results;
-=======
-    console.log(file.data);
-    let stream = Readable.from(file.data);
-    let result = stream.pipe(bucket.actions.openUploadStream(file.name));
-    console.log(result.id)
-    return result.id;
->>>>>>> 3e29272db5dfa97fde482d522db8857360648d00
 }
 const getFile = async(id)=>{
     let cursor; 

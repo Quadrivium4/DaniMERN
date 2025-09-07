@@ -1,4 +1,6 @@
 import { crossing, sendForm } from "./utils";
+import axios from "axios";
+
 let protectedUrl =  process.env.NODE_ENV === "production" ? 
                     process.env.REACT_APP_ONLINE_SERVER_URL + "/protected" : 
                     process.env.REACT_APP_LOCAL_SERVER_URL + "/protected";
@@ -12,8 +14,11 @@ const postSubcourse = async(subcourse)=>{
 const uploadSubcourseFiles = async(formData) =>{
     return await sendForm(protectedUrl + "/upload-subcourse-files", "POST", formData);
 }
+const uploadSubcourseCover = async(formData) =>{
+    return await sendForm(protectedUrl + "/upload-subcourse-cover", "POST", formData);
+}
 const deleteSubcourseFiles = async (data) => {
-    return await crossing(protectedUrl + "/upload-subcourse-files", "DELETE", data);
+    return axios.delete(protectedUrl + "/upload-subcourse-files", { params: data, withCredentials: true, credentials: "include" });
 }
 const updateCourse = async(course) =>{
     return await sendForm(protectedUrl + "/course", "PUT", course);
@@ -51,6 +56,7 @@ export {
     updateCourse,
     updateSubcourse,
     uploadSubcourseFiles,
+    uploadSubcourseCover,
     deleteSubcourseFiles,
     deleteCourse,
     deleteSubcourse,

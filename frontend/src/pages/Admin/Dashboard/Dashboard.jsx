@@ -17,7 +17,7 @@ import {
 } from "../../../admin";
 import { logout, getSubcourses, getCourses, getReviews, getSubcourse  } from "../../../controllers";
 import "./Dashboard.css"
-import FileUpload from "../../../components/FileUpload/FileUpload";
+import FileUpload from "../../../components/FileUpload/FileUpload.tsx";
 import { downloadFile } from "../../../utils";
 import { baseUrl } from "../../../App";
 import Scroller from "../../../components/Scroller/Scroller";

@@ -5,15 +5,16 @@ import Store from "./Store/Store";
 import Product from "./Product/Product";
 import Verified from "./Verified";
 import Admin, { Admin1,} from "./Admin/Admin";
-import View from "./View/View";
+import View from "./View/View.tsx";
 import Payment from "./Payment/Payment";
 import {useUser} from "../Context";
 import Review from "./Review/Review";
 import { EditSubcourse } from "./Admin/Dashboard/Components/EditSubcourse/EditSubcourse.tsx";
 
 const Pages = () =>{
-    const {isLogged, info }= useUser();
+    const {isLogged, info, loading }= useUser();
     console.log("Pages: ",{isLogged, info})
+    if(loading) return <p>Loading...</p>
     return (
         <Routes>
             <Route

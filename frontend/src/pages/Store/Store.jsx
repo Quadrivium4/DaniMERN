@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 import { useUser, useUserDispatch } from "../../Context";
 import {baseUrl} from "../../App"
 import "./Store.css"
+import Transformable from "../../components/Transformable/Transformable.tsx";
 
 const Store = () => {
     const dispatch = useUserDispatch();
@@ -23,6 +24,16 @@ const Store = () => {
     },[])
     return (
         <div id="store" className="page">
+            <Transformable>
+                <div style={{width: 200, height: 200, backgroundColor: "purple"}}><a href="./cooc">bel</a></div>
+            </Transformable>
+            {/* <object
+                data={
+                    "https://res.cloudinary.com/dkbe7c8we/image/upload/v1757152146/yrkm72khobblsso9wxhl.pdf#toolbar=1&navpanes=1&scrollbar=1"
+                }
+            >
+                eh
+            </object> */}
             <div id="products">
                 {store ? (
                     store.map((course) => {
@@ -34,7 +45,7 @@ const Store = () => {
                                         <img
                                             className="course-img"
                                             alt="course-img"
-                                            src={course.coverImg}
+                                            src={course.coverImg.url}
                                         />
                                         <h2>{course.name}</h2>
                                         <h2 id="price">
