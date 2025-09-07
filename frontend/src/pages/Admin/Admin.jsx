@@ -22,8 +22,6 @@ import { downloadFile } from "../../utils";
 import { baseUrl } from "../../App";
 import Scroller from "../../components/Scroller/Scroller";
 import Checkbox from "../../components/Checkbox/Checkbox";
-import Message from "../../components/Message";
-import { set } from "mongoose";
 
 
 
