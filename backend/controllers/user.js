@@ -52,15 +52,16 @@ const login = async (req, res) => {
 const uploadUserImg = async(req, res) =>{
     const user = req.user;
     const email = user.email;
-    const fileId = await saveFile(req.files.file)
+    console.log(req.files);
+    const file = await saveFile(req.files.file);
     const newUser = await User.findOneAndUpdate({ email }, {
-        profileImg: fileId
+        profileImg: file
     }, {
         new: true
     });
     if (user.profileImg) await deleteFile(user.profileImg);
     console.log(newUser);
-    res.send({fileId})
+    res.send({file})
 }
 const uploadUserVideo = async (req, res) => {
     const email = req.session.userEmail;

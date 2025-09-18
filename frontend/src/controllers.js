@@ -31,6 +31,7 @@ const getCourse = async (id) => {
 const getSubcourse = async (id) => {
     return await crossing(protectedUrl + "/subcourse/" + id);
 }
+//const uploadSubcourseFiles
 const getSubcourses = async () => {
     return await crossing(protectedUrl + "/subcourse", "GET")
 }

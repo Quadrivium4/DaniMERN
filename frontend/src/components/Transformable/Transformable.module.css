@@ -1,0 +1,20 @@
+@import "../../root.css";
+.transformable{
+    background-color: var(--dark);
+    padding: 10px;
+    border-radius:5px;
+    display: flex;
+    border: 1px solid gray;
+}
+.grabber {
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(90deg);
+}
+.childrenContainer{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}

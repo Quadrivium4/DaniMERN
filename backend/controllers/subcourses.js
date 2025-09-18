@@ -3,6 +3,7 @@ const { requestCourseData, } = require("../utils");
 const { deleteFile, saveFile } = require("../utils/files");
 const path = require("path");
 const { UNAUTHORIZED, RESOURCE_NOT_FOUND } = require("../constants/errorCodes");
+const { save } = require("pdfkit");
 
 
 const getSubcourse = async (req, res) => {
@@ -15,7 +16,10 @@ const getSubcourse = async (req, res) => {
     res.send({
         ok: true,
         message: "You got it",
-        data: data
+        data: {
+            medias: data.medias,
+            files: subcourse.files
+        }
     });
 }
 const getSubcourses = async (req, res) => {
@@ -43,34 +47,72 @@ const postSubcourse = async (req, res) => {
     const { name, description, price, hashedId } = req.body;
     let user = req.user;
     if (user.role !== "admin") throw new AppError(1, 403, "You are not an admin");
-    const fileId = await saveFile(req.files.coverImg);
+    const file = await saveFile(req.files.coverImg);
     const subcourse = await Subcourse.create({
         name,
         description,
         price,
         hashedId,
-        coverImg: fileId
+        coverImg: file
     })
     res.send({message: "subcourse created", subcourse})
 }
+const uploadSubcourseFiles = async(req, res) => {
+    console.log(req.body);
 
+    const {hashedId, id} = req.body;
+    let user = req.user;
+    if (user.role !== "admin") throw new AppError(1, 403, "You are not an admin");
+
+    const file = await saveFile(req.files.file);
+    let newSubcourse = await Subcourse.findOneAndUpdate({ _id: id }, {
+       $push: {[`files.${hashedId}`]: file}
+    }, {new: true})
+    
+    res.send({file});
+}
+const deleteSubcourseFiles = async(req, res) =>{
+    console.log(req.body, req.query);
+    const {hashedId, id, public_id} = req.query;
+    let user = req.user;
+    if (user.role !== "admin") throw new AppError(1, 403, "You are not an admin");
+
+    let newSubcourse = await Subcourse.findOneAndUpdate({ _id: id }, {
+       $pull: {[`files.${hashedId}`]: {public_id}}
+    }, {new: true})
+    await deleteFile({public_id});
+    res.send({subcourse: newSubcourse});
+}
+const uploadSubcourseCover = async(req, res) => {
+    console.log(req.files);
+    const {id} = req.body;
+    let user = req.user;
+    if (user.role !== "admin") throw new AppError(1, 403, "You are not an admin");
+
+    const file = await saveFile(req.files.coverImg);
+    let oldSubcourse = await Subcourse.findByIdAndUpdate({
+        coverImg: file
+    });
+    if(oldSubcourse.coverImg) deleteFile(oldSubcourse.coverImg);
+    
+    res.send({image: file});
+}
 const putSubcourse = async (req, res) => {
     console.log("body",req.body);
-    console.log("files", req.files);
+    //console.log("files", req.files);    
     const { name, description, price, hashedId, id } = req.body;
 
     let user = req.user;
     if(user.role !== "admin") throw new AppError(1, 403, "You are not an admin");
 
-    const fileId = await saveFile(req.files.coverImg);
+    //const file = await saveFile(req.files.coverImg);
     let oldSubcourse = await Subcourse.findOneAndUpdate({_id: id},{
         name,
         description,
         price,
         hashedId,
-        coverImg: fileId
     })
-    if(oldSubcourse.coverImg) await deleteFile(oldSubcourse.coverImg);
+    //if(oldSubcourse.coverImg) await deleteFile(oldSubcourse.coverImg);
     
     console.log("old subcourse:", oldSubcourse);
     //console.log("new subcourse", )
@@ -89,5 +131,8 @@ module.exports = {
     getSubcourses,
     postSubcourse,
     putSubcourse,
-    deleteSubcourse
+    uploadSubcourseFiles,
+    uploadSubcourseCover,
+    deleteSubcourse,
+    deleteSubcourseFiles
 }

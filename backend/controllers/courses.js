@@ -114,13 +114,13 @@ const postCourse = async (req, res) => {
     subcourses = JSON.parse(subcourses);
     let user = req.user;
     if (user.role == "admin") {
-        let fileId = await saveFile(req.files.coverImg);
+        let file = await saveFile(req.files.coverImg);
         Course.create({
             name,
             description,
             price,
             subcourses,
-            coverImg: fileId
+            coverImg: file
         })
     };
 }
@@ -129,13 +129,13 @@ const putCourse = async (req, res) => {
     subcourses = JSON.parse(subcourses);
     let user = req.user;
     if (user.role == "admin") {
-        let fileId = await saveFile(req.files.coverImg)
+        let file = await saveFile(req.files.coverImg)
         let oldCourse = await Course.findOneAndUpdate({_id: id},{
             name,
             description,
             price,
             subcourses,
-            coverImg: fileId
+            coverImg: file
         });
         if(oldCourse.coverImg) await deleteFile(oldCourse.coverImg)
         console.log("old course:", oldCourse);

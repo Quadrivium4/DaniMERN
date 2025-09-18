@@ -1,35 +1,7 @@
-const cloudinary = require('cloudinary').v2;
+const obj = {};
 
-
-// Configuration 
-cloudinary.config({
-    cloud_name: "dkbe7c8we",
-    api_key: "233516748631711",
-    api_secret: "fwWhVAQtii4Cy4vP4FFekTHxBhI"
-});
-
-
-// Upload
-
-const res = cloudinary.uploader.upload('https://dani-courses.onrender.com/files/6412d2c99d4e9df440659e43', { public_id: "olympic_flag" })
-
-res.then((data) => {
-    console.log(data);
-    console.log(data.secure_url);
-}).catch((err) => {
-    console.log(err);
-});
-
-
-// Generate 
-const url = cloudinary.url("olympic_flag", {
-    width: 100,
-    height: 150,
-    Crop: 'fill'
-});
+obj["he"]["d"] = "red"
 
 
 
-// The output url
-console.log(url);
-// https://res.cloudinary.com/<cloud_name>/image/upload/h_150,w_100/olympic_flag
+console.log(obj)

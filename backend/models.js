@@ -23,8 +23,9 @@ const UserSchema = new mongoose.Schema({
         type:String,
         trim: true
     },
-    profileImg: {
-        type: String
+    profileImg:{
+        type: Object,
+        default: {}
     },
     allowedReviews: {
         type: Number,
@@ -95,9 +96,9 @@ const CourseSchema = new mongoose.Schema({
         default: []
     },
     coverImg: {
-        type: String,
-        required: true
-    }
+        type: Object,
+        default: {}
+    },
 });
 const Course = mongoose.model("Course", CourseSchema);
 const PaypalOrderSchema  = new mongoose.Schema({
@@ -148,8 +149,12 @@ const SubcourseSchema = new mongoose.Schema({
         required: true
     },
     coverImg: {
-        type: String,
-        required: true
+        type: Object,
+        default: {}
+    },
+    files: {
+        type: Object,
+        default: {}
     }
 });
 const Subcourse = mongoose.model("Subcourse", SubcourseSchema);

@@ -4,7 +4,7 @@ const publicRouter = express.Router();
 
 const { login, register, getUser, uploadUserImg, logout, registerConfirmation, uploadUserVideo, deleteUser} = require("./controllers/user");
 const {postCourse, putCourse, getCourse, getPublicCourse, getCourses, getStore, deleteCourse, testUpload} = require("./controllers/courses")
-const { postSubcourse, putSubcourse, getSubcourse, getSubcourses, deleteSubcourse } = require("./controllers/subcourses");
+const { postSubcourse, putSubcourse, getSubcourse, getSubcourses, deleteSubcourse, uploadSubcourseFiles, deleteSubcourseFiles, uploadSubcourseCover } = require("./controllers/subcourses");
 const {getReviews, postReview, deleteReview, putReview} = require("./controllers/reviews")
 const {confirmPaymentIntent,createPaymentIntent, stripeEvents, createPaypalOrder, capturePaypalOrder, approvePaypalOrder, validateCredentials, validateCoupon, pay} = require("./controllers/payment");
 const { tryCatch } = require("./utils");
@@ -59,7 +59,11 @@ protectedRouter.route("/discount/:id")
     .get(tryCatch(getDiscount))
     .delete(tryCatch(deleteDiscount))
 
+protectedRouter.route("/upload-subcourse-files")
+    .post(tryCatch(uploadSubcourseFiles))
+    .delete(tryCatch(deleteSubcourseFiles));  
 
+protectedRouter.route("/upload-subcourse-cover").post(tryCatch(uploadSubcourseCover));
 protectedRouter.route("/user/upload").post(tryCatch(uploadUserImg))
 protectedRouter.route("/user/upload/videos").post(tryCatch(uploadUserVideo))
 protectedRouter.route("/user")

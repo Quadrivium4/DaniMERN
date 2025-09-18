@@ -1,13 +1,28 @@
 #view {
     flex-direction: column;
+    background-color: var(--light);
+    align-items: center;
 }
 #view .videos{
-    width: 100%;
     display: flex;
-    flex-wrap: wrap;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    container-type: size;
+    background-color: var(--light);
+}
+#view .view-content{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+    gap: 16px;
 }
 #view  .videos .video{
-    background-color: rgb(255, 187, 0);
-    max-width: 50%;
-    min-width: 300px;
+    position: absolute;
+    /*background-color: rgb(255, 187, 0);*/
+
 }
