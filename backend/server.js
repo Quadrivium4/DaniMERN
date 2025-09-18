@@ -54,7 +54,7 @@ app.use(session({
     saveUninitialized: false,
     store: MongoStore.create({
         mongoUrl: process.env.MONGO_URI,
-        dbName: "Store"
+        dbName: "danimern"
     })
 }))
 app.use("/protected", protectedRouter);
