@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {redirect, useNavigate, useLocation} from "react-router-dom";
-import {useUserDispatch} from "../Context";
+import {useUserDispatch} from "../Context.tsx";
 import { login } from "../controllers";
 import Message from "./Message";
 

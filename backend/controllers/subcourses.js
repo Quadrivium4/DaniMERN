@@ -6,6 +6,32 @@ const { UNAUTHORIZED, RESOURCE_NOT_FOUND } = require("../constants/errorCodes");
 const { save } = require("pdfkit");
 
 
+const getSubcourseInfo = async (req, res) => {
+    const { id } = req.params;
+    let subcourse = await Subcourse.findById(id);
+    if(!subcourse) throw new AppError(RESOURCE_NOT_FOUND, 404, "No subcourses");
+    let data = await requestCourseData(subcourse.hashedId);
+    console.log("data", data)
+    let duration = 0;
+    for (let i = 0; i < data.medias.length; i++) {
+        const media= data.medias[i];
+        duration += media.duration
+        
+    }
+    // for(let media in data.medias){
+    //     console.log(media);
+    //     duration += media.duration
+    // }
+    res.send({
+        ok: true,
+        message: "You got it",
+        data: {
+            videoNumber: data.medias.length,
+            duration: duration
+            
+        }
+    });
+}
 const getSubcourse = async (req, res) => {
     const { id } = req.params;
     let user = req.user;
@@ -47,6 +73,7 @@ const postSubcourse = async (req, res) => {
     const { name, description, price, hashedId } = req.body;
     let user = req.user;
     if (user.role !== "admin") throw new AppError(1, 403, "You are not an admin");
+    console.log("posting subcourse");
     const file = await saveFile(req.files.coverImg);
     const subcourse = await Subcourse.create({
         name,
@@ -84,15 +111,16 @@ const deleteSubcourseFiles = async(req, res) =>{
     res.send({subcourse: newSubcourse});
 }
 const uploadSubcourseCover = async(req, res) => {
-    console.log(req.files);
+    console.log(req.files, req.body);
     const {id} = req.body;
     let user = req.user;
     if (user.role !== "admin") throw new AppError(1, 403, "You are not an admin");
 
     const file = await saveFile(req.files.coverImg);
-    let oldSubcourse = await Subcourse.findByIdAndUpdate({
+    let oldSubcourse = await Subcourse.findByIdAndUpdate(id, {
         coverImg: file
     });
+    console.log(oldSubcourse);
     if(oldSubcourse.coverImg) deleteFile(oldSubcourse.coverImg);
     
     res.send({image: file});
@@ -134,5 +162,6 @@ module.exports = {
     uploadSubcourseFiles,
     uploadSubcourseCover,
     deleteSubcourse,
-    deleteSubcourseFiles
+    deleteSubcourseFiles,
+    getSubcourseInfo
 }

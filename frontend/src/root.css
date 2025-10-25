@@ -4,8 +4,9 @@
         24);
     --medium: rgb(10, 43, 48);
     --light: #0e3c43;
+    /* --light: white; */
     --extra-light: rgb(87, 124, 115);
-    --primary: rgb(33, 50, 100);
+    --primary: #0e3c43;
 }
 * {
     margin: 0;
@@ -37,4 +38,15 @@ input.autofill-field {
 
 :focus {
     outline: 0
+}
+ul{
+    padding: 20px;
+}
+@font-face {
+  font-family: Roboto; /* set name */
+  src: url(./assets/fonts/Roboto.ttf); /* url of the font */
+}
+@font-face {
+  font-family: Lexend; /* set name */
+  src: url(./assets/fonts/Lexend.ttf); /* url of the font */
 }

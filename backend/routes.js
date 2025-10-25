@@ -4,7 +4,7 @@ const publicRouter = express.Router();
 
 const { login, register, getUser, uploadUserImg, logout, registerConfirmation, uploadUserVideo, deleteUser} = require("./controllers/user");
 const {postCourse, putCourse, getCourse, getPublicCourse, getCourses, getStore, deleteCourse, testUpload} = require("./controllers/courses")
-const { postSubcourse, putSubcourse, getSubcourse, getSubcourses, deleteSubcourse, uploadSubcourseFiles, deleteSubcourseFiles, uploadSubcourseCover } = require("./controllers/subcourses");
+const { postSubcourse, putSubcourse, getSubcourse, getSubcourses, deleteSubcourse, uploadSubcourseFiles, deleteSubcourseFiles, uploadSubcourseCover, getSubcourseInfo } = require("./controllers/subcourses");
 const {getReviews, postReview, deleteReview, putReview} = require("./controllers/reviews")
 const {confirmPaymentIntent,createPaymentIntent, stripeEvents, createPaypalOrder, capturePaypalOrder, approvePaypalOrder, validateCredentials, validateCoupon, pay} = require("./controllers/payment");
 const { tryCatch } = require("./utils");
@@ -20,6 +20,7 @@ const {createDiscount, getDiscount, getDiscounts, deleteDiscount, updateDiscount
 publicRouter.get("/", (req, res) =>{
     res.send("hello")
 })
+publicRouter.get('/subcourse/:id', tryCatch(getSubcourseInfo));
 publicRouter.get("/files/:id", tryCatch(downloadFile))
 
 protectedRouter.use(tryCatch(verifyUser));

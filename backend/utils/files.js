@@ -16,13 +16,19 @@ const saveFile = async(file)=>{
     const b64 = Buffer.from(file.data).toString("base64");
     let dataURI = "data:" + file.mimetype + ";base64," + b64;
    // console.log({dataURI, b64, mimetype: file.mimetype, name: file.name})
-    const result = await cloudinary.uploader.upload(dataURI);
-    console.log(result);
+   try {
+     const result = await cloudinary.uploader.upload(dataURI);
+     console.log(result);
     return {
         url: result.url,
         name: file.name,
         public_id: result.public_id
     }
+   } catch (error) {
+    console.log("cloudinary error", error)
+   }
+   
+    
     // let stream = Readable.from(file.data);
     // let result = stream.pipe(bucket.actions.openUploadStream(file.name));
     // console.log(result)

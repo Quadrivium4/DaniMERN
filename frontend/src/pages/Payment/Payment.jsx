@@ -5,11 +5,11 @@ import {Elements} from "@stripe/react-stripe-js";
 import StripeForm from "./StripeForm";
 import PaypalForm from "./PaypalForm";
 import { baseUrl } from "../../App";
-import { useUser, useUserDispatch } from "../../Context";
+import { useUser, useUserDispatch } from "../../Context.tsx";
 import Message from "../../components/Message";
 import Pop from "../../components/Pop";
 import Login from "../../components/Login";
-import { logout } from "../../controllers";
+import { getPublicSubcourse, logout } from "../../controllers";
 import { PayPalScriptProvider} from "@paypal/react-paypal-js";
 import "./Payment.css"
 import creditCards from "../../assets/icons/credit-cards.png";
@@ -36,7 +36,16 @@ function Payment(){
     const dispatch = useUserDispatch();
     const [paymentType, setPaymentType] = useState();
     const [loginPop, setLoginPop] = useState(false);
-    const [couponCode, setCouponCode] = useState(false)
+    const [couponCode, setCouponCode] = useState(false);
+    const [duration, setDuration] = useState();
+    const [videoNumber, setVideoNumber] = useState()
+    useEffect(() =>{
+        getPublicSubcourse(item.id).then(res =>{
+            console.log("cicci", res);
+            setDuration(res.data.duration);
+            setVideoNumber(res.data.videoNumber)
+        })
+    },[])
     const validateCredentials = async()=>{
         console.log({credentials})
         let result = await fetch(baseUrl + "/validate-credentials", {
@@ -59,20 +68,21 @@ function Payment(){
                 </Pop>
             ) : null}
             <section className="course-info">
-                <h1>Il corso</h1>
+                <h2>Il corso</h2>
                 {item ? (
                     <>
                         <div className="details">
                             <img
-                                src={item.coverImg}
+                                src={item.coverImg.url}
                                 alt={item.description}
                             ></img>
                             <div>
-                                <h2>{item.name}</h2>
+                                <h3>{item.name}</h3>
                                 <p>{item.description}</p>
+                                {videoNumber &&<p>number of videos: {videoNumber}</p>}
+                                {duration && <p>total duration: {(duration ).toFixed(0)} seconds</p>}
                             </div>
-                            <h2>€{(item.price / 100).toFixed(2)}</h2>
-                        </div>
+                           
 
                         {item.subcourses ? (
                             <div>
@@ -92,24 +102,25 @@ function Payment(){
                                     );
                                 })}
                             </div>
+                           
                         ) : null}
-                    </>
-                ) : (
+                         </div>
+                    </>) : (
                     <p>loading</p>
                 )}
             </section>
             <section className="data">
                 {!isLogged && !loading ? (
                     <>
-                        <h1>Registrati</h1>
+                        <h2>Registrati</h2>
                         <p>
-                            Already have an account?{" "}
+                            Hai gia' un account?{" "}
                             <button onClick={() => setLoginPop(true)}>
                                 Login
                             </button>
                         </p>
                         <div className="form">
-                            <h3>Name:</h3>
+                            <h3>Nome:</h3>
                             <input
                                 name="name"
                                 onChange={(e) =>
@@ -177,7 +188,7 @@ function Payment(){
                     </>
                 ) : isLogged ? (
                     <>
-                        <h1>info</h1>
+                        <h2>info</h2>
                         <div className="form">
                             <h3>Name:</h3>
                             <input type="text" value={info.name} disabled />
@@ -215,7 +226,8 @@ function Payment(){
                 ) : null}
             </section>
             <section className="payment">
-                <h1>Pagamento</h1>
+                <h2>Pagamento</h2>
+                <p>Totale: <b>€{(item.price/100).toFixed(2)}</b> </p>
                 <div className="payment-options">
                     <PaymentOption
                         img={creditCards}

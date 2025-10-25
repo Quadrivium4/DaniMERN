@@ -3,7 +3,7 @@ import Video from "../../components/Video";
 import { getCourse, getSubcourse } from "../../controllers";
 import { useLocation } from "react-router-dom";
 import { insertScriptHead } from "../../utils";
-import { useUser, useUserDispatch } from "../../Context";
+import { useUser, useUserDispatch } from "../../Context.tsx";
 import "./View.css"
 import Sidebar from "./components/Sidebar.tsx";
 import VideoSkeleton from "./components/VideoSkeleton.tsx";

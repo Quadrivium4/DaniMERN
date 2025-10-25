@@ -28,6 +28,9 @@ const getUser = async() =>{
 const getCourse = async (id) => {
     return await crossing(protectedUrl + "/course/" + id);
 }
+const getPublicSubcourse = async(id) =>{
+    return await crossing(baseUrl + "/subcourse/" + id);
+}
 const getSubcourse = async (id) => {
     return await crossing(protectedUrl + "/subcourse/" + id);
 }
@@ -65,5 +68,6 @@ export {
     deleteReview,
     deleteUser,
     getFile,
-    validateCoupon
+    validateCoupon,
+    getPublicSubcourse
 }

@@ -23,7 +23,7 @@ const Product = () => {
                             return (
                                 <div key={subcourse.id} className="subcourse">
                                     
-                                    <img src={subcourse.coverImg} alt="subcourse cover" className="subcourse-img"></img>
+                                    <img src={subcourse.coverImg.url} alt="subcourse cover" className="subcourse-img"></img>
                                     <h2>{subcourse.name}</h2>
                                     <p className="price">€{(subcourse.price/100).toFixed(2)}</p>
                                     <Link to="/checkout" state={subcourse}>

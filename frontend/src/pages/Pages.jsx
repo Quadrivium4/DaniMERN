@@ -7,9 +7,11 @@ import Verified from "./Verified";
 import Admin, { Admin1,} from "./Admin/Admin";
 import View from "./View/View.tsx";
 import Payment from "./Payment/Payment";
-import {useUser} from "../Context";
+import {useUser} from "../Context.tsx";
 import Review from "./Review/Review";
 import { EditSubcourse } from "./Admin/Dashboard/Components/EditSubcourse/EditSubcourse.tsx";
+import PrivacyPolicy from "./PrivacyPolicy/PrivacyPolicy.tsx";
+import TermsOfUse from "./TermsOfUse/TermsOfUse.tsx";
 
 const Pages = () =>{
     const {isLogged, info, loading }= useUser();
@@ -20,6 +22,14 @@ const Pages = () =>{
             <Route
                 path="/"
                 element={isLogged ? <Navigate to="/dashboard" /> : <Store />}
+            ></Route>
+            <Route
+                path="/privacy-policy"
+                element={<PrivacyPolicy />}
+            ></Route>
+            <Route
+                path="/terms-of-use"
+                element={<TermsOfUse />}
             ></Route>
             <Route path="/store" element={<Store />}></Route>
             {isLogged && info.role === "admin" ? (

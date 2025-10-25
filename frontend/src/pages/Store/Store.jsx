@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import {Link} from "react-router-dom";
-import { useUser, useUserDispatch } from "../../Context";
+import { useUser, useUserDispatch } from "../../Context.tsx";
 import {baseUrl} from "../../App"
 import "./Store.css"
 import Transformable from "../../components/Transformable/Transformable.tsx";
@@ -24,9 +24,6 @@ const Store = () => {
     },[])
     return (
         <div id="store" className="page">
-            <Transformable>
-                <div style={{width: 200, height: 200, backgroundColor: "purple"}}><a href="./cooc">bel</a></div>
-            </Transformable>
             {/* <object
                 data={
                     "https://res.cloudinary.com/dkbe7c8we/image/upload/v1757152146/yrkm72khobblsso9wxhl.pdf#toolbar=1&navpanes=1&scrollbar=1"

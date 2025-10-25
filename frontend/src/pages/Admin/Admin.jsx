@@ -1,6 +1,6 @@
 import {  useEffect, useState, useRef} from "react"
 import { useNavigate, Link, Route, Routes, Outlet, useLocation } from "react-router-dom";
-import { useUser, useUserDispatch } from "../../Context";
+import { useUser, useUserDispatch } from "../../Context.tsx";
 import Pop from "../../components/Pop";
 import {
     postCourse,

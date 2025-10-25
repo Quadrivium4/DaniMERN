@@ -81,7 +81,7 @@ const SectionsScoller = ({sections, currentSection, setCurrentSection}: {section
             {sections.map(section => {
                 return (
                 <div key={section} className={styles.section} style={{backgroundColor: currentSection === section? "var(--medium)" : "var(--dark)", width: sectionWidth}} onClick={() => handleClick(section)}>
-                    <h4>{section}</h4>
+                    <p>{section}</p>
                 </div>)
             })}
         </div>

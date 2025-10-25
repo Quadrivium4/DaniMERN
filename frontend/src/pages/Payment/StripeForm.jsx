@@ -8,7 +8,7 @@ useStripe,
 useElements
 } from "@stripe/react-stripe-js";
 import { baseUrl } from "../../App";
-import { useUser } from "../../Context";
+import { useUser } from "../../Context.tsx";
 import Message from "../../components/Message";
 import { crossing } from "../../utils";
 

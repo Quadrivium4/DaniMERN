@@ -187,8 +187,10 @@ export const EditSubcourse = () =>{
                     <p>Course Cover</p>
                     <FileUpload
                         setFile={(file) => {
+                            console.log("setting file", subcourseData)
                             const formData = new FormData();
                             formData.append("coverImg", file);
+                            formData.append('id', subcourseData.id)
                             console.log({file});
                             uploadSubcourseCover(formData).then((data) => {
                                 setSubcourseData({

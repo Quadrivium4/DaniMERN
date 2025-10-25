@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import {useUser, useUserDispatch} from "../Context";
+import {useUser, useUserDispatch} from "../Context.tsx";
 import { Link } from "react-router-dom";
 import { getUser } from "../controllers";
 const Verified = () => {

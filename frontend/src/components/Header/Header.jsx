@@ -7,7 +7,7 @@ import accountImg from "../../assets/images/account-picture.png"
 import headerImg from "../../assets/images/header.jpg";
 import logoImg from "../../assets/images/logo.png";
 import "./Header.css";
-import { useUser, useUserDispatch } from "../../Context";
+import { useUser, useUserDispatch } from "../../Context.tsx";
 import AdminIcon from "../../assets/images/admin.png"
 
 const Header = () => {
@@ -17,6 +17,7 @@ const Header = () => {
     const handleLoginPop = () => {
         setLoginPop(!loginPop);
     }
+    
 
     return (
         <div id="header">
@@ -29,8 +30,8 @@ const Header = () => {
             <div className="triangle"></div>
             {isLogged? 
                     <Link to="/dashboard">
-                        {info?.profileImg ? 
-                            <img alt="account-img" className="account-img" src={info.role === "admin"? AdminIcon: info.profileImg} />
+                        {info?.profileImg.url ? 
+                            <img alt="account-img" className="account-img" src={info.role === "admin"? AdminIcon: info.profileImg.url} />
                             :
                             <img alt="account-img" className="account-img" src={accountImg} />
                         }
@@ -60,9 +61,14 @@ const Header1 = () => {
     return (
         <div id="header">
                 <h1>Maxen Academy</h1>
+                <div className="profile">
+
+
                 {isLogged ? (
+
                     <Link to="/dashboard">
-                        {info?.profileImg.url ? (
+                        
+                        { info.profileImg?.url || info.role === "admin"? (
                             <img
                                 alt="account-img"
                                 className="account-img"
@@ -88,6 +94,7 @@ const Header1 = () => {
                         src={accountImg}
                     />
                 )}
+                  </div>
                 {loginPop ? (
                     <Pop toggle={handleLoginPop}>
                         <Login toggle={handleLoginPop} />

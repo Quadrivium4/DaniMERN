@@ -1,6 +1,7 @@
 @import "../../root.css";
 #admin {
     display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-around;
     width: 100%;

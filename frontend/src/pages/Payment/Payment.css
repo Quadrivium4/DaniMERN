@@ -13,11 +13,19 @@
 #checkout section h1{
     text-align: center;
 }
-#checkout .data .info{
+#checkout .data {
     display: flex;
     flex-direction: column;
+    
+    
+}
+#checkout section h2{
+    text-transform: capitalize;
+    text-align: center;
+    margin-bottom: 10px;
 }
 #checkout .course-info{
+
     align-items: center;
 }
 #checkout .course-info img{

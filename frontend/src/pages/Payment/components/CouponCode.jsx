@@ -22,7 +22,7 @@ const CouponValidation = ({item, setCoupon}) =>{
     }
     return (
         <div className="coupon" style={{display: toggle? "flex" : "block"}}>
-            <h2>Buono Sconto</h2>
+            <h3>Buono sconto</h3>
             {toggle? <button onClick={()=>setToggle(false)}>+</button> : 
                 <>
                 <input disabled={isValid} type="text" value={couponId} onChange={(e)=> setCouponId(e.target.value)}/>

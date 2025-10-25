@@ -43,14 +43,22 @@
 
 }
 #header h1 {
+    text-transform: uppercase;
+    font-family: Roboto;
+    font-weight: 900;
     margin-bottom: 0;
+    color: var(--medium);
 }
-#header .account-img{
+#header .profile{
     width: 50px;
     height: 50px;
     position: absolute;
-    object-fit: cover;
     right: 20px;
+}
+#header .account-img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     border-radius: 50%;
 }
 #header .account-img:hover{

@@ -1,8 +1,8 @@
-import { useUser } from "../../../Context";
+import { useUser } from "../../../Context.tsx";
 const PaymentOption = ({img, setPaymentType, currentPaymentType, paymentType, name, isSubmitted, setMessage})=>{
     const {isLogged} = useUser();
     console.log({paymentType, currentPaymentType, isSubmitted, isLogged})
-    let backgroundColor = paymentType === currentPaymentType ?"rgb(15,20,55)": null;
+    let backgroundColor = paymentType === currentPaymentType ?"var(--light)": null;
     const handleClick = () =>{
         console.log(isSubmitted)
         if(!isSubmitted && !isLogged) return setMessage({content: "Registrati!", type: "error"});

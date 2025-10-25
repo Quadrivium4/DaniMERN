@@ -7,6 +7,7 @@
 
 #dashboard {
     display: flex;
+    flex-direction: row;
     height: 100%;
     padding: 30px;
     gap: 20px;
@@ -37,7 +38,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    overflow-y: scroll;
+    overflow-y: auto;
     word-break: break-all;
 }
 
@@ -140,6 +141,11 @@
 
 #dashboard #user img {
     width: 100%;
+    max-width: 180px;
+    aspect-ratio: 1;
+    border-radius: 100px;
+    object-fit: cover;
+    
 }
 #dashboard #user button {
     margin-top: 10px;
@@ -147,7 +153,8 @@
 #dashboard #purchases .scroller{
     flex-direction: row;
     flex-wrap: wrap;
-    
+    gap: 10px;
+    background: var(--dark);
 }
 #dashboard .course{
     background: var(--dark);
@@ -168,6 +175,7 @@
     font-size: 22px;
     word-break: keep-all;
     min-width: 180px;
+    width: 100%;
 }
  #dashboard .course img{
     width: 100%;
@@ -175,5 +183,5 @@
 #dashboard .subcourse img {
     width: 100%;
     min-width: 100px;
-    max-width: 200px;
+    /* max-width: 250px; */
 }

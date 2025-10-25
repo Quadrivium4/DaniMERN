@@ -1,8 +1,8 @@
 import  { createContext, useContext, useReducer, useEffect } from "react";
 import { redirect } from "react-router-dom";
 import { getUser } from "./controllers";
-export const UserContext = createContext(null);
-export const UserDispatchContext =createContext(null);
+export const UserContext = createContext<any>(null);
+export const UserDispatchContext =createContext<any>(null);
 
 
 const initialState = {
@@ -16,7 +16,7 @@ const initialState = {
     store: null,
 }
 
-const userReducer = (state, action) =>{
+const userReducer = (state: any, action: {value: any, type: string}) =>{
     //console.log("state:", state, "action:", action)
     console.log(action)
     switch(action.type){
@@ -36,16 +36,20 @@ const userReducer = (state, action) =>{
         case "SET_LOADING":
             return { ...state,  loading: false };
         case "RESET": 
-            localStorage.setItem("isLogged", false);
+            localStorage.setItem("isLogged", "false");
             return {initialState, loading: false};
         default: return state
     }
 
 }
-
-export const Context = ({children}) =>{
+const getIsLoggedLocal = () =>{
+    let local = localStorage.getItem("isLogged");
+    if(local) return JSON.parse(local);
+    return false;
+}
+export const Context = ({children}:{children: any}) =>{
     const [state, dispatch] = useReducer(userReducer, initialState);
-    const isLoggedLocal = JSON.parse(localStorage.getItem("isLogged"));
+    const isLoggedLocal = getIsLoggedLocal();
     const {isLogged} = state;
     useEffect(() => {
         console.log({isLoggedLocal, isLogged})
@@ -71,6 +75,7 @@ export const Context = ({children}) =>{
     }, [])
 
     return (
+        
         <UserContext.Provider value={state}>
             <UserDispatchContext.Provider value={dispatch}>
                 {children}

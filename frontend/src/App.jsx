@@ -2,7 +2,7 @@ import Pages from "./pages/Pages";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer"
 import { BrowserRouter as Router, Link } from "react-router-dom";
-import {Context} from "./Context.js";
+import {Context} from "./Context.tsx";
 import "./App.css"
 
 export const baseUrl =  process.env.NODE_ENV === "production" ? 

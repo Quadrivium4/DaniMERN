@@ -3,12 +3,17 @@
     padding: 20px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     background: var(--dark);
 }
-#contact {
-    width: 600px;
+#footer #contact {
+    /* width: 600px; */
     display: flex;
     flex-direction: row;
    justify-content: space-around;
+}
+#footer #legal {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
 }

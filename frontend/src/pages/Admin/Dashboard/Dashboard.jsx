@@ -1,6 +1,6 @@
 import {  useEffect, useState, useRef} from "react"
 import { useNavigate, Link, Route, Routes } from "react-router-dom";
-import { useUser, useUserDispatch } from "../../../Context";
+import { useUser, useUserDispatch } from "../../../Context.tsx";
 import Pop from "../../../components/Pop";
 import {
     postCourse,
@@ -23,7 +23,6 @@ import { baseUrl } from "../../../App";
 import Scroller from "../../../components/Scroller/Scroller";
 import Checkbox from "../../../components/Checkbox/Checkbox";
 import Message from "../../../components/Message";
-import { set } from "mongoose";
 
 
 
