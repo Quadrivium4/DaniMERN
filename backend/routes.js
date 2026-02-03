@@ -2,9 +2,9 @@ const express = require('express');
 const protectedRouter = express.Router();
 const publicRouter = express.Router();
 
-const { login, register, getUser, uploadUserImg, logout, registerConfirmation, uploadUserVideo, deleteUser} = require("./controllers/user");
-const {postCourse, putCourse, getCourse, getPublicCourse, getCourses, getStore, deleteCourse, testUpload} = require("./controllers/courses")
-const { postSubcourse, putSubcourse, getSubcourse, getSubcourses, deleteSubcourse, uploadSubcourseFiles, deleteSubcourseFiles, uploadSubcourseCover, getSubcourseInfo } = require("./controllers/subcourses");
+const { login, register, getUser, uploadUserImg, logout, registerConfirmation, uploadUserVideo, deleteUser, updateUserCourseProgress} = require("./controllers/user");
+const {postCourse, putCourse, getCourse, getPublicCourse, getCourses, getStore, deleteCourse, testUpload, updateCourseCover, getStoreV2} = require("./controllers/courses")
+const { postSubcourse, putSubcourse, getSubcourse, getSubcourses, deleteSubcourse, uploadSubcourseFiles, deleteSubcourseFiles, uploadSubcourseCover, getSubcourseInfo, uploadSubcourseFileIds, getPublicSubcourse } = require("./controllers/subcourses");
 const {getReviews, postReview, deleteReview, putReview} = require("./controllers/reviews")
 const {confirmPaymentIntent,createPaymentIntent, stripeEvents, createPaypalOrder, capturePaypalOrder, approvePaypalOrder, validateCredentials, validateCoupon, pay} = require("./controllers/payment");
 const { tryCatch } = require("./utils");
@@ -20,7 +20,8 @@ const {createDiscount, getDiscount, getDiscounts, deleteDiscount, updateDiscount
 publicRouter.get("/", (req, res) =>{
     res.send("hello")
 })
-publicRouter.get('/subcourse/:id', tryCatch(getSubcourseInfo));
+publicRouter.get('/subcourse-info/:id', tryCatch(getSubcourseInfo));
+publicRouter.get('/subcourse/:id', tryCatch(getPublicSubcourse));
 publicRouter.get("/files/:id", tryCatch(downloadFile))
 
 protectedRouter.use(tryCatch(verifyUser));
@@ -29,6 +30,8 @@ protectedRouter.route("/subcourse")
     .get(tryCatch(getSubcourses))
     .post(tryCatch(postSubcourse))
     .put(tryCatch(putSubcourse))
+protectedRouter.route("/update-course-progress")
+    .post(tryCatch(updateUserCourseProgress))
 //protectedRouter.route("/pay").get(tryCatch(pay))
 protectedRouter.route("/course")
     .get(tryCatch(getCourses))
@@ -63,14 +66,18 @@ protectedRouter.route("/discount/:id")
 protectedRouter.route("/upload-subcourse-files")
     .post(tryCatch(uploadSubcourseFiles))
     .delete(tryCatch(deleteSubcourseFiles));  
-
+protectedRouter.route("/upload-subcourse-file-ids")
+    .post(tryCatch(uploadSubcourseFileIds))
 protectedRouter.route("/upload-subcourse-cover").post(tryCatch(uploadSubcourseCover));
+protectedRouter.route("/course-cover").post(tryCatch(updateCourseCover));
+
 protectedRouter.route("/user/upload").post(tryCatch(uploadUserImg))
 protectedRouter.route("/user/upload/videos").post(tryCatch(uploadUserVideo))
 protectedRouter.route("/user")
     .get(tryCatch(getUser))
     .delete(tryCatch(deleteUser))
 protectedRouter.route("/logout").get(tryCatch(logout))
+
 
 publicRouter.route("/validate-coupon").post(tryCatch(validateCoupon))
 publicRouter.route("/create-payment-intent").post(tryCatch(createPaymentIntent))
@@ -82,7 +89,9 @@ publicRouter.route("/approve-paypal-order").post(tryCatch(approvePaypalOrder));
 publicRouter.route("/capture-paypal-order/:id").get(tryCatch(capturePaypalOrder));
 
 publicRouter.route("/course/:id").get(tryCatch(getPublicCourse));
-publicRouter.route("/store").get(tryCatch(getStore));
+
+
+publicRouter.route("/store").get(tryCatch(getStoreV2));
 publicRouter.route("/verify/:userId/:token").get(tryCatch(registerConfirmation))
 publicRouter.route("/login").post(tryCatch(login))
 publicRouter.route("/register").post(tryCatch(register))

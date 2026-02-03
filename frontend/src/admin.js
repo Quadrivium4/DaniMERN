@@ -9,13 +9,17 @@ const postCourse = async(course) =>{
     return await sendForm(protectedUrl + "/course", "POST", course);
 }
 const postSubcourse = async(subcourse)=>{
-    return await sendForm(protectedUrl + "/subcourse", "POST", subcourse);
+    console.log("posting", {subcourse})
+    return await axios.post(protectedUrl + "/subcourse",  subcourse,{withCredentials: true});
 }
 const uploadSubcourseFiles = async(formData) =>{
     return await sendForm(protectedUrl + "/upload-subcourse-files", "POST", formData);
 }
+const uploadSubcourseFileIds = async(payload) =>{
+    return await axios.post(protectedUrl + "/upload-subcourse-file-ids",  payload, {withCredentials: true});
+}
 const uploadSubcourseCover = async(formData) =>{
-    return await sendForm(protectedUrl + "/upload-subcourse-cover", "POST", formData);
+    return await sendForm(protectedUrl + "/upload-subcourse-cover", "POST", formData, );
 }
 const deleteSubcourseFiles = async (data) => {
     return axios.delete(protectedUrl + "/upload-subcourse-files", { params: data, withCredentials: true, credentials: "include" });
@@ -24,7 +28,7 @@ const updateCourse = async(course) =>{
     return await sendForm(protectedUrl + "/course", "PUT", course);
 }
 const updateSubcourse = async(subcourse)=> {
-    return await sendForm(protectedUrl + "/subcourse", "PUT", subcourse);
+    return await axios.put(protectedUrl + "/subcourse", subcourse, {withCredentials: true});
 }
 const deleteCourse = async(id) =>{
     return await crossing(protectedUrl + "/course/" + id, "DELETE");
@@ -56,6 +60,7 @@ export {
     updateCourse,
     updateSubcourse,
     uploadSubcourseFiles,
+    uploadSubcourseFileIds,
     uploadSubcourseCover,
     deleteSubcourseFiles,
     deleteCourse,

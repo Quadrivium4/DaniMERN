@@ -84,7 +84,7 @@ const Dashboard= () => {
                     {popContent}
                 </Pop>
             ) : null}
-            <section id="reviews">
+            {/* <section id="reviews">
                 <h1>Reviews</h1>
                 <Scroller>
                     <div className="container">
@@ -113,8 +113,8 @@ const Dashboard= () => {
                             : null}
                     </div>
                 </Scroller>
-            </section>
-            <section id="courses">
+            </section> */}
+            {/* <section id="courses">
                 <h1>Corsi</h1>
                 <Scroller>
                     {courses?.map((course) => {
@@ -190,9 +190,9 @@ const Dashboard= () => {
                 >
                     new course
                 </button>
-            </section>
+            </section> */}
             <section id="subcourses">
-                <h1>Sottocorsi</h1>
+                <h1>Corsi</h1>
                 <Scroller>
                     <div className="products">
                         {subcourses?.map((subcourse) => {
@@ -265,7 +265,7 @@ const Dashboard= () => {
                             _id: "",
                         };
                         navigate("edit-subcourse", {
-                            state: { subcourse: emptySubcourse, action: "update" },
+                            state: { subcourse: emptySubcourse, action: "create" },
                         });
                         // setPopContent(
                         //     <EditSubcourse
@@ -325,10 +325,10 @@ const Dashboard= () => {
                 setPopContent(<EditDiscount discount={emptyDiscount} subcourses={subcourses} courses={courses} action="create"></EditDiscount>)
                 }}>new discount</button>
             </section> */}
-            <section id="promotion-codes">
+            {/* <section id="promotion-codes">
                 <h1>Promotions</h1>
                 <Scroller></Scroller>
-            </section>
+            </section> */}
             <button
                 onClick={async () => {
                     let data = await logout();

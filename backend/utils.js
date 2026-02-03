@@ -40,7 +40,16 @@ const deleteFile = (filePath) =>{
         }
     })
 }
-
+const getSubcourseIds = (userSubcourses)=>{
+    let userSubcourseIds = [];
+    for(let i = 0; i < userSubcourses.length; i++){
+        let s = userSubcourses[i];
+        console.log(i, s)
+        userSubcourseIds.push(s.id);
+    }
+    console.log(userSubcourseIds, userSubcourses)
+    return userSubcourseIds;
+}
 const sendMail = async(body, to, subject) =>{
     
     const accessToken = await oAuth2Client.getAccessToken();
@@ -281,5 +290,6 @@ module.exports = {
     createPdfReview,
     deleteWistiaVideo,
     testSpeed,
-    saveFile
+    saveFile,
+    getSubcourseIds
 }

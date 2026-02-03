@@ -28,12 +28,16 @@ const getUser = async() =>{
 const getCourse = async (id) => {
     return await crossing(protectedUrl + "/course/" + id);
 }
+const getSubcourseData = async(id) =>{
+    return await crossing(baseUrl + "/subcourse-info/" + id);
+}
 const getPublicSubcourse = async(id) =>{
     return await crossing(baseUrl + "/subcourse/" + id);
 }
 const getSubcourse = async (id) => {
     return await crossing(protectedUrl + "/subcourse/" + id);
 }
+
 //const uploadSubcourseFiles
 const getSubcourses = async () => {
     return await crossing(protectedUrl + "/subcourse", "GET")
@@ -54,7 +58,9 @@ const deleteUser = async() =>{
 const validateCoupon = async(body) =>{
     return await crossing(baseUrl + "/validate-coupon","POST", body)
 }
-
+const updateCourseProgress = async(body) =>{
+    return await crossing(protectedUrl + "/update-course-progress", "POST", body);
+}
 export {
     login,
     register,
@@ -69,5 +75,7 @@ export {
     deleteUser,
     getFile,
     validateCoupon,
-    getPublicSubcourse
+    getPublicSubcourse,
+    getSubcourseData,
+    updateCourseProgress
 }

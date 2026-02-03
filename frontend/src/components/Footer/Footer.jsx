@@ -8,8 +8,8 @@ const Footer = ()=>{
                 {/* <p>P. iva:  02712000039</p> */}
             </div>
             <div id="legal">
-                <a href="./privacy-policy">Privacy Policy</a>
-                <a href="./terms-of-use">Terms of Use</a>
+                <a href="/privacy-policy">Privacy Policy</a>
+                <a href="/terms-of-use">Terms of Use</a>
             </div>
             
         </div>

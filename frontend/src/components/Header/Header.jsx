@@ -60,7 +60,7 @@ const Header1 = () => {
 
     return (
         <div id="header">
-                <h1>Maxen Academy</h1>
+                <h1>Video Academy</h1>
                 <div className="profile">
 
 

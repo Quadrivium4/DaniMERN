@@ -4,6 +4,21 @@ const { deleteFile, saveFile } = require("../utils/files");
 const path = require("path");
 const fs = require("fs");
 const { UNAUTHORIZED, RESOURCE_NOT_FOUND } = require("../constants/errorCodes");
+const getStoreV2 = async(req, res) =>{
+    let store = [];
+    let subcourses =  await Subcourse.find({});
+    store = subcourses.map(course =>{
+        return {
+            id: course._id,
+            name: course.name,
+            description: course.description,
+            price: course.price,
+            coverImg: course.coverImg,
+    }
+    })
+
+    res.send({courses: store})
+}
 const getStore = async (req, res) => {
     const store = [];
     let init = Date.now()
@@ -150,7 +165,16 @@ const deleteCourse = async (req, res) => {
         console.log("deleted course:", deletedCourse);
     };
 }
-
+const updateCourseCover = async(req, res) =>{
+    const {id, file} = req.body;
+    console.log(req.body);
+    let user = req.user;
+    if (user.role == "admin") {
+        let ourse = await Course.findByIdAndUpdate(id, {coverImg: file});
+        await deleteFile(course.coverImg);
+        
+    };
+}
 module.exports = {
     getCourse,
     getPublicCourse,
@@ -158,5 +182,7 @@ module.exports = {
     postCourse,
     putCourse,
     getStore,
-    deleteCourse
+    getStoreV2,
+    deleteCourse,
+    updateCourseCover
 }

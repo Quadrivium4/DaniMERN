@@ -118,11 +118,18 @@ const capturePaypalOrder = async (req, res) => {
     let subcourses = []
     if (itemType === "course") {
         item = await Course.findById(itemId);
+        
         courses.push(item.id)
     }
     else if (itemType === "subcourse") {
         item = await Subcourse.findById(itemId);
-        subcourses.push(item.id);
+          
+        const emptySubcourse = {
+            progress: 0,
+            
+            id: item.id
+        }
+        subcourses.push(emptySubcourse);
     }
     else throw new AppError(1, 404, "No item found with that name")
     
@@ -146,7 +153,13 @@ const capturePaypalOrder = async (req, res) => {
                 courses
             })
         } else {
-            subcourses = [...user.subcourses, itemId];
+              
+            const emptySubcourse = {
+                progress: 0,
+                
+                id: item.id
+            }
+            subcourses = [...user.subcourses, emptySubcourse];
             user = await User.findByIdAndUpdate(user._id, {
                 subcourses
             })
@@ -212,11 +225,18 @@ const confirmPaymentIntent = async (req, res) =>{
     let subcourses = []
     if (itemType === "course") {
         item = await Course.findById(itemId);
+        // Da rifare
         courses.push(item.id)
     }
     else if (itemType === "subcourse") {
         item = await Subcourse.findById(itemId);
-        subcourses.push(item.id);
+        
+        const emptySubcourse = {
+            progress: 0,
+            
+            id: item.id
+        }
+        subcourses.push(emptySubcourse);
     }
     else throw new AppError(1, 404, "No item found with that name")
 
@@ -239,7 +259,11 @@ const confirmPaymentIntent = async (req, res) =>{
                 courses
             })
         } else {
-            subcourses = [...user.subcourses, itemId];
+            const emptySubcourse = {
+                progress: 0,
+                id: itemId
+            }
+            subcourses = [...user.subcourses, emptySubcourse];
             user = await User.findByIdAndUpdate(user.id, {
                 subcourses
             })

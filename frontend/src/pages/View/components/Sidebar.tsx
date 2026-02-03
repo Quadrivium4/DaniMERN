@@ -6,21 +6,17 @@ import { IoMdClose, IoMdDownload, IoMdSearch } from "react-icons/io";
 import { MdArrowBack, MdArrowBackIos, MdArrowBackIosNew, MdArrowForward, MdArrowForwardIos } from "react-icons/md";
 import Select from "../../../components/Select/Select.tsx";
 import { VideosSekeleton } from "./VideoSkeleton.tsx";
+import { useVideo } from "../VideoContext.tsx";
 
-const Sidebar = ({videos, setCurrentVideo, currentVideo, loading}: {videos: TSubcourseVideos, currentVideo?: TVideo ,loading: boolean, setCurrentVideo: (video: TVideo)=>void}) =>{
+const Sidebar = () =>{
     //console.log("sidebar videos", videos);
-    const [currentSection, setCurrentSection] = useState<string>("main" );
-    //const [selectedVideo, setSelectedVideo] = useState()
+    const {videos, currentSection, setVideo, loading, currentVideo, } = useVideo()
 
-    const changeSection = (section: string) =>{
-        setCurrentSection(section);
-        setCurrentVideo(videos[section][Object.keys(videos[section])[0]]);
-    }
     return (
         <div className={styles.sidebar}>
             <Search videos={videos} onResult={({video, section})=>{
-                setCurrentSection(section);
-                setCurrentVideo(video);
+                
+                setVideo(section, video);
             }}/>
             <div className={styles.videos}>
                 {loading? <VideosSekeleton i={10} color="red" style={{backgroundColor: "var(--medium)", height: [50,40][Math.round(Math.random())], aspectRatio: "unset", containerType: "normal", marginBottom: 3, borderRadius: 8}}/>:
@@ -29,24 +25,27 @@ const Sidebar = ({videos, setCurrentVideo, currentVideo, loading}: {videos: TSub
                     Object.entries(videos[currentSection]).map(([id, video]) => {
                         //console.log("owowwowow")
                         if(video.files.length > 0){
-                           // console.log({ video });
+                            console.log("cicci")
+                           console.log({ video });
                         }
-                        return <VideoItem video={video} selected={currentVideo?.hashed_id == video.hashed_id} setCurrentVideo={setCurrentVideo} />
+                        return <VideoItem key={id} video={video} selected={currentVideo?.hashed_id == video.hashed_id} setCurrentVideo={() =>setVideo(currentSection, video)} />
                         
                     })
                 }
             </div>
-            <SectionsScoller sections={Object.keys(videos)} currentSection={currentSection} setCurrentSection={changeSection}/>
+            <SectionsScoller />
 
             
         </div>
     )
 
 }
-const SectionsScoller = ({sections, currentSection, setCurrentSection}: {sections: string[], currentSection: string, setCurrentSection: (section: string)=>void}) =>{
-     const ref = useRef<HTMLDivElement>(null);
+const SectionsScoller = () =>{
+    const {currentSection, setSection: setCurrentSection, videos, previousSection, nextSection} = useVideo()
+    const sections = Object.keys(videos);
+    const ref = useRef<HTMLDivElement>(null);
      const sectionWidth = 200;
-     const [index, setIndex] = useState(sections.indexOf(currentSection) );
+     const index = sections.indexOf(currentSection) ;
      useEffect(()=>{
         ref.current?.scrollTo({left: (sections.indexOf(currentSection) * sectionWidth ), behavior: "smooth"})
      },[currentSection, sections])
@@ -54,24 +53,10 @@ const SectionsScoller = ({sections, currentSection, setCurrentSection}: {section
         setCurrentSection(section);
         ref.current?.scrollTo({left: (sections.indexOf(section) * sectionWidth ), behavior: "smooth"})
      }
-     const next = () =>{
-        if(index === sections.length - 1) return;
-        setCurrentSection(sections[index + 1]);
-        ref.current?.scrollTo({left: ((index + 1) * sectionWidth ), behavior: "smooth"})
-        setIndex(index + 1);
-       
-     }
-     const prev = () =>{
-        if(index === 0) return;
-        setCurrentSection(sections[index - 1]);
-        ref.current?.scrollTo({left: ((index - 1) * sectionWidth ), behavior: "smooth"})
-        setIndex(index - 1);
-       
-     }
     return (
         <div className={styles.sectionScroller}>
             <div className={styles.arrowIcon} style={{borderRadius: "8px 0px 0px 8px"}}>
-                    <MdArrowBackIosNew size={30} color="white" onClick={prev} ></MdArrowBackIosNew>
+                    <MdArrowBackIosNew size={30} color="white" onClick={previousSection} ></MdArrowBackIosNew>
             </div>
 
         <div className={styles.sectionsContainer} ref={ref} style={{width: sectionWidth}}>
@@ -86,7 +71,7 @@ const SectionsScoller = ({sections, currentSection, setCurrentSection}: {section
             })}
         </div>
        
-        </div>  <div className={styles.arrowIcon} style={{borderRadius: "0px 8px 8px 0px"}}><MdArrowForwardIos size={30} color="white" onClick={next}></MdArrowForwardIos> </div>     </div>)
+        </div>  <div className={styles.arrowIcon} style={{borderRadius: "0px 8px 8px 0px"}}><MdArrowForwardIos size={30} color="white" onClick={nextSection}></MdArrowForwardIos> </div>     </div>)
 }
 // const SidebarVideoCard = ({video}) =>{
 //     return (
@@ -95,7 +80,7 @@ const SectionsScoller = ({sections, currentSection, setCurrentSection}: {section
 //         </div>
 //     )
 // }
-const VideoItem = ({video, selected, setCurrentVideo}) =>{
+const VideoItem = ({video, selected, setCurrentVideo}: {video: TVideo, selected: boolean, setCurrentVideo: () => void}) =>{
     const [pop, setPop] = useState<React.JSX.Element | null>(null);
     const id = video.hashed_id;
     return (
@@ -103,7 +88,7 @@ const VideoItem = ({video, selected, setCurrentVideo}) =>{
             key={id}
             className={styles.videoItem}
             style={{border: selected? "1px solid var(--extra-light)" :  "1px solid var(--medium)"}}
-            onClick={()=>setCurrentVideo(video)}
+            onClick={()=>setCurrentVideo()}
         >
             
             <p>{video.name}</p>
@@ -115,6 +100,7 @@ const VideoItem = ({video, selected, setCurrentVideo}) =>{
             >
 
                 {video.files.map((file) => {
+                    console.log({file, files: video.files})
                     return (
                         <>
                         {pop }
@@ -129,7 +115,8 @@ const VideoItem = ({video, selected, setCurrentVideo}) =>{
                             
                         >
                             <p
-                                onClick={() => setPop(<FilePop file={file} closePop={() => setPop(null)}/>)}
+                               onClick={() => setPop(<FilePop file={file} closePop={() => setPop(null)}/>)}
+                                
                                 className={
                                     styles.fileName
                                 }
@@ -208,6 +195,7 @@ const FilePop = ({file, closePop}: {file: TFile, closePop: ()=>void}) =>{
    
     const [fileBlob, setFileBlob]  = useState<Blob | null>(null);
     useEffect(()=>{
+        console.log("file", {file})
         fetch(file.url).then(res => res.blob()).then(blob => {
             setFileBlob(blob);
             console.log(blob);

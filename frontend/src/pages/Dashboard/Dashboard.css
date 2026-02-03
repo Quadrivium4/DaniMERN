@@ -153,6 +153,8 @@
 #dashboard #purchases .scroller{
     flex-direction: row;
     flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
     gap: 10px;
     background: var(--dark);
 }
@@ -175,6 +177,7 @@
     font-size: 22px;
     word-break: keep-all;
     min-width: 180px;
+    max-width: 300px;
     width: 100%;
 }
  #dashboard .course img{

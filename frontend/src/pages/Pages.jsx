@@ -12,6 +12,7 @@ import Review from "./Review/Review";
 import { EditSubcourse } from "./Admin/Dashboard/Components/EditSubcourse/EditSubcourse.tsx";
 import PrivacyPolicy from "./PrivacyPolicy/PrivacyPolicy.tsx";
 import TermsOfUse from "./TermsOfUse/TermsOfUse.tsx";
+import LandingPage from "./LandingPage/LandingPage.tsx";
 
 const Pages = () =>{
     const {isLogged, info, loading }= useUser();
@@ -30,6 +31,10 @@ const Pages = () =>{
             <Route
                 path="/terms-of-use"
                 element={<TermsOfUse />}
+            ></Route>
+             <Route
+                path="/landing-page/:id"
+                element={<LandingPage />}
             ></Route>
             <Route path="/store" element={<Store />}></Route>
             {isLogged && info.role === "admin" ? (
@@ -59,7 +64,9 @@ const Pages = () =>{
             ></Route>
             <Route
                 path="/view/:id"
-                element={isLogged ? <View /> : <Navigate to="/" />}
+                element={isLogged ?
+                     <View /> 
+                     : <Navigate to="/" />}
             ></Route>
             <Route path="/product" element={<Product />}></Route>
             <Route path="/checkout" element={<Payment />}></Route>

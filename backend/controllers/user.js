@@ -5,15 +5,18 @@ const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
 const SALT_ROUNDS = 10;
-const { validateEmail, sendMail, getNewFileName, uploadWistiaVideo} = require("../utils");
+const { validateEmail, sendMail, getNewFileName, uploadWistiaVideo, getSubcourseIds} = require("../utils");
 const {deleteFile, getFile, saveFile} = require("../utils/files");
 const {deleteCustomer} = require("../utils/stripe");
+const { subscribe } = require("diagnostics_channel");
 
 const login = async (req, res) => {
     console.log(req.body)
     const { email, password } = req.body;
     console.log(req.body);
     console.log(email, password);
+    let users = await User.find({});
+    console.log({users})
     let user = await User.findOne({
         email: email,
     })
@@ -25,18 +28,19 @@ const login = async (req, res) => {
             if (!result) return res.status(401).send({ ok: false, message: "Incorrect password" })
             else {
                 req.session.userEmail = email;
-                let courses;
+                let courses = [];
                 let subcourses;
+                let coursesIds = getSubcourseIds(user.subcourses);
                 if (user.role == "admin") {
                     courses = await Course.find({});
                     subcourses = await Subcourse.find({})
                 } else {
                     console.log(user.courses)
-                    courses = await Course.find({
-                        _id: { $in: user.courses }
-                    });
+                    // courses = await Course.find({
+                    //     _id: { $in: user.courses.id }
+                    // });
                     subcourses = await Subcourse.find({
-                        _id: { $in: user.subcourses }
+                        _id: { $in: coursesIds}
                     })
                 }
                 return res.send({ ok: true, message: "User found", user: user, courses, subcourses})
@@ -132,16 +136,35 @@ const getUser = async (req, res) => {
     const user = req.user;
     let courses;
     let subcourses;
+    let progressSubcourses
     if (user.role == "admin") {
         courses = await Course.find({});
         subcourses = await Subcourse.find({})
     } else {
+        let subcourseIds = getSubcourseIds(user.subcourses);
         courses = await Course.find({
             _id: { $in: user.courses }
         });
+        
         subcourses = await Subcourse.find({
-            _id: { $in: user.subcourses }
+            _id: { $in: subcourseIds }
         })
+        progressSubcourses = subcourses.map(s =>{
+            let sub = user.subcourses.find(val => val.id == s.id);
+            return {
+                ...s.toObject(),
+                progress: sub.progress
+            }
+        })
+        for (let i = 0; i < user.subcourses.length; i++) {
+            const s = user.subcourses[i];
+            for (let j = 0; j < subcourses.length; j++) {
+                if(subcourses[j].id == s.id){
+                    subcourses[j].progress = s.progress;
+                }
+            
+            }
+        }
     }
     return res.send({
         ok: true,
@@ -149,7 +172,7 @@ const getUser = async (req, res) => {
         user: user,
         role: user.role,
         courses: courses,
-        subcourses: subcourses
+        subcourses: progressSubcourses
     });
 
 }
@@ -254,6 +277,16 @@ const deleteUser = async(req, res) =>{
     console.log("User deleted succesfully!")
     res.send({ok: true, message: "User deleted succesfully!"})
 }
+const updateUserCourseProgress = async(req, res) =>{
+    const user = req.user;
+    const {id, progress} = req.body;
+    console.log({id, progress})
+    const updatedUser = await User.findOneAndUpdate({_id: user.id, "subcourses.id": id}, {
+        "subcourses.$.progress": progress
+    },{new: true});
+    console.log(updatedUser)
+    res.send(updatedUser);
+}
 module.exports = {
     login,
     getUser,
@@ -262,5 +295,6 @@ module.exports = {
     register,
     registerConfirmation,
     logout,
-    deleteUser
+    deleteUser,
+    updateUserCourseProgress
 }

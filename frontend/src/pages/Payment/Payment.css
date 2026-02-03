@@ -2,6 +2,7 @@
 #checkout {
     gap: 20px;
     padding: 20px;
+    flex-direction: row;
 }
 #checkout section{
     width: 100%;
@@ -45,6 +46,12 @@
 }
 #checkout .data #message{
     margin-top: 10px;
+}
+#checkout .payment > h2 {
+    margin-bottom: 10px;
+}
+#checkout .payment > h3 {
+    margin-bottom: 10px;
 }
 #checkout .payment .payment-options {
     display: flex;

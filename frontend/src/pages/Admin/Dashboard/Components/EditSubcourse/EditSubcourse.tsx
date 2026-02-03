@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { getSubcourse } from "../../../../../controllers";
-import { deleteSubcourseFiles, postSubcourse, updateSubcourse, uploadSubcourseCover, uploadSubcourseFiles } from "../../../../../admin";
+import { deleteSubcourseFiles, postSubcourse, updateSubcourse, uploadSubcourseCover, uploadSubcourseFileIds, uploadSubcourseFiles } from "../../../../../admin";
 import FileUpload from "../../../../../components/FileUpload/FileUpload.tsx";
 import styles from "./EditSubcourse.module.css"
 import Draggable from "react-draggable";
@@ -10,12 +10,15 @@ import Moveable from "react-moveable";
 import Transformable from "../../../../../components/Transformable/Transformable";
 import {IoMdClose} from "react-icons/io"
 import { getSrcFromUserFile } from "../../../../../utils";
+import { uploadImageToCloudinary } from "../../../../../u.ts";
 export type TSubcourse = {
     name: string,
     description: string,
     price: number,
     hashedId: string,
     coverImg: TImage,
+    promoVideo: string,
+    promoDescription: string,
     files: TFile[],
     id: string
 }
@@ -28,7 +31,9 @@ export type TVideo = {
     hashed_id: string,
     name: string,
     files: TFile[],
-    section?: string
+    duration: number,
+    section?: string,
+    progress: number
 }
 export type TImage ={
     url: string,
@@ -40,16 +45,16 @@ export type TFile = {
     public_id: string,
     name: string
 }
-export const createSubcourseVideos = (files: TFile[], medias: TVideo[]) =>{
+export const createSubcourseVideos = (files: {[id: string]: TFile[]}, medias: TVideo[]) =>{
     let newSubcourseVideos : TSubcourseVideos = { main: {} };
-    let videoFiles;
+    let videoFiles: TFile[] = [];
     for (let i = 0; i < medias.length; i++) {
         const video = medias[i];
         if(files){
             videoFiles = files[video.hashed_id];
             
         }
-        video.files = videoFiles || [];
+        video.files = videoFiles? videoFiles: [];
         if(!video.section){
             newSubcourseVideos.main[video.hashed_id] = video;
         }else if(video.section && newSubcourseVideos.hasOwnProperty(video.section)){
@@ -65,19 +70,34 @@ export const createSubcourseVideos = (files: TFile[], medias: TVideo[]) =>{
      console.log({newSubcourseVideos})
     return newSubcourseVideos;
 }
+type TUpdateFileParams = {
+    file: TFile, videoHahsedId: string, section: string
+}
 export const EditSubcourse = () =>{
     const { subcourse, action} = useLocation().state //as {subcourse: TSubcourse, action: "create" | "update"};
     const refMoveable = useRef(null);
     const [moveTarget, setMoveTarget] = useState(null);
     const imgPreview = useRef(null)
-    const [subcourseData, setSubcourseData] = useState<TSubcourse>({
+    const [subcourseData, setSubcourseData] = useState<TSubcourse>(subcourse? {
         name: subcourse.name,
         description: subcourse.description,
         price: subcourse.price,
         hashedId: subcourse.hashedId,
         coverImg: subcourse.coverImg,
+        promoDescription: subcourse.promoDescription || "",
+        promoVideo: subcourse.promoVideo || "",
         files: [],
         id: subcourse._id
+    }: {
+        name: "",
+        description: "",
+        price: "",
+        hashedId: "",
+        coverImg: "",
+        promoDescription:  "",
+        promoVideo:  "",
+        files: [],
+        id: ""
     });
 
     const [subcourseVideos, setSubcourseVideos] = useState<TSubcourseVideos>(
@@ -92,17 +112,20 @@ export const EditSubcourse = () =>{
     },[subcourseVideos])
     useEffect(() =>{
         console.log({subcourse})
+        if(!subcourse?._id) return;
         getSubcourse(subcourse._id).then(({data})=>{
             console.log(data);
             
-            let newSubcourseVideos : TSubcourseVideos =createSubcourseVideos(subcourse.files, data.medias);
+            let newSubcourseVideos : TSubcourseVideos =createSubcourseVideos(data.files, data.medias);
             setSubcourseVideos(newSubcourseVideos);
             //console.log("subcourse data", res);
             //setSubcourseVideos(data.medias);
         });
     },[])
 
-    const updateFile = (file: TFile, videoHahsedId, section ) =>{
+    const updateFile = (params: TUpdateFileParams) =>{
+        
+        const {section, videoHahsedId, file} = params;
         console.log("updating file", file, videoHahsedId);
         let newVideos :TSubcourseVideos = {...subcourseVideos};
         if (newVideos[section][videoHahsedId].files){
@@ -112,7 +135,8 @@ export const EditSubcourse = () =>{
         }
         setSubcourseVideos(newVideos);
     }
-    const removeFile = (file, videoHahsedId, section) =>{
+    const removeFile = (params: TUpdateFileParams) =>{
+          const {section, videoHahsedId, file} = params;
          let newVideos :TSubcourseVideos = { ...subcourseVideos };
          if (newVideos[section][videoHahsedId].files) {
             let newFiles : TFile[] = [];
@@ -127,20 +151,12 @@ export const EditSubcourse = () =>{
          setSubcourseVideos(newVideos);
     }
     const handleEdit = async() =>{
-        const form = new FormData();
-        form.append("name", subcourseData.name);
-        form.append("description", subcourseData.description);
-        form.append("price", subcourseData.price.toString());
-        form.append("hashedId", subcourseData.hashedId);
-            for(const [key, value] of Object.entries(subcourseData) ){
-                
-              
-                console.log(key, value)
-            }
+     
         if(action === "update"){
-            updateSubcourse(form);
+            updateSubcourse(subcourseData).then(res =>console.log("hello update res", res))
         }else if(action === "create"){
-            postSubcourse(form);
+            console.log("creating..");
+            postSubcourse(subcourseData).then(res =>console.log("res", res))
         }else{
             console.log("unknown action")
         }
@@ -186,26 +202,17 @@ export const EditSubcourse = () =>{
                     />
                     <p>Course Cover</p>
                     <FileUpload
-                        setFile={(file) => {
-                            console.log("setting file", subcourseData)
-                            const formData = new FormData();
-                            formData.append("coverImg", file);
-                            formData.append('id', subcourseData.id)
-                            console.log({file});
-                            uploadSubcourseCover(formData).then((data) => {
-                                setSubcourseData({
+                        setFile={async(file) => {
+                           let res =  await uploadImageToCloudinary(file);
+                                 setSubcourseData({
                                     ...subcourseData,
-                                    coverImg: data.image,
+                                    coverImg: res
                                 });
-                            });
-                            // setSubcourseData({
-                            //     ...subcourseData,
-                            //     coverImg: file,
-                            // });
+                    
                         }}
                         filePreview={imgPreview}
                         type="image"
-                        defaultFileSrc={subcourse.coverImg.url}
+                        defaultFileSrc={subcourse?.coverImg?.url}
                     >
                         <img
                             className={styles.img}
@@ -221,6 +228,28 @@ export const EditSubcourse = () =>{
                             setSubcourseData({
                                 ...subcourseData,
                                 hashedId: e.target.value,
+                            })
+                        }
+                    />
+                    <p>promo video:</p>
+                    <input
+                        type="text"
+                        value={subcourseData.promoVideo}
+                        onChange={(e) =>
+                            setSubcourseData({
+                                ...subcourseData,
+                                promoVideo: e.target.value,
+                            })
+                        }
+                    />
+                    <p>promo description:</p>
+                    <input
+                        type="text"
+                        value={subcourseData.promoDescription}
+                        onChange={(e) =>
+                            setSubcourseData({
+                                ...subcourseData,
+                                promoDescription: e.target.value,
                             })
                         }
                     />
@@ -254,31 +283,64 @@ export const EditSubcourse = () =>{
         </div>
     );
 }
-const VideoItem = ({video, section, updateFile, removeFile, subcourseId}) =>{
+const VideoItem = ({video, section, updateFile, removeFile, subcourseId}: {video: TVideo, section: string, updateFile: (p: TUpdateFileParams)=>void, removeFile:(p:TUpdateFileParams)=> void, subcourseId: string}) =>{
     const [uploadingFile, setUploadingFile] = useState<{data: any, videoHashedId: string} | null>();
-    const uploadFile = async (file, videoHashedId, section) => {
-        const fileSrc = await getSrcFromUserFile(file);
+      const [uploadingProgress, setUploadingProgress] = useState(0);
+        const [uploadingImg, setUploadingImage] = useState<File>();
+      const handleUploadProfileImg = async(file: File, videoHahsedId: string) =>{
+        setUploadingProgress(0.1);
+        setUploadingImage(file);
+        const res = await uploadImageToCloudinary(file,  (progress)=>{
+        setUploadingProgress(progress );
+        });
+        await uploadSubcourseFileIds({
+            hashedId: videoHahsedId,
+            id: subcourseId,
+            file: {
+        public_id: res.public_id, 
+        name: res.name,
+        url: res.url
+        }});
+     
+        setUploadingProgress(100);
+        setTimeout(()=>setUploadingProgress(0), 100)
+    }
+    const uploadFile = async (file: File, videoHashedId: string, section: string) => {
+          const fileSrc = await getSrcFromUserFile(file);
         setUploadingFile({ data: fileSrc, videoHashedId });
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("hashedId", videoHashedId);
-        formData.append("id", subcourseId);
-        // console.log(
-        //     formData
-        // );
-        const fileRes = await uploadSubcourseFiles(formData);
+
+         setUploadingProgress(0.1);
+        setUploadingImage(file);
+        const res = await uploadImageToCloudinary(file,  (progress)=>{
+        setUploadingProgress(progress );
+        });
+        await uploadSubcourseFileIds({
+            hashedId: videoHashedId,
+            id: subcourseId,
+            file: {
+                public_id: res.public_id, 
+                name: res.name,
+                url: res.url
+                }});
+     
+        setUploadingProgress(100);
+        setTimeout(()=>setUploadingProgress(0), 100)
+      
+        updateFile({
+            file: res, videoHahsedId: videoHashedId, section
+        })
         setUploadingFile(null);
-        updateFile(fileRes.file, videoHashedId, section);
+
 
         console.log("File uploaded successfully");
     };
-    const deleteFile = async(file, videoHahsedId, section) =>{
+    const deleteFile = async(file: TFile, videoHahsedId: string, section: string) =>{
         await deleteSubcourseFiles({
             id: subcourseId,
             hashedId: videoHahsedId,
             public_id: file.public_id,
         });
-        removeFile(file, videoHahsedId, section);
+        removeFile({file, videoHahsedId, section});
         console.log("File deleted successfully");
     }
     const id = video.hashed_id;
@@ -287,6 +349,7 @@ const VideoItem = ({video, section, updateFile, removeFile, subcourseId}) =>{
             key={id}
             className={styles.videoItem}
         >
+            
             <p>{video.name}</p>
 
             <div

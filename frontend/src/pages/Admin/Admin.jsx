@@ -22,6 +22,7 @@ import { downloadFile } from "../../utils";
 import { baseUrl } from "../../App";
 import Scroller from "../../components/Scroller/Scroller";
 import Checkbox from "../../components/Checkbox/Checkbox";
+import { uploadImageToCloudinary } from "../../u.ts";
 
 
 
@@ -131,8 +132,11 @@ export const EditCourse = ({course, subcourses, action}) =>{
                 onChange={(e) =>setCourseData({...courseData, price: e.target.value})}/>
                 <p>Course Cover</p>
                 <FileUpload 
-                setFile={(file)=>{
-                    setCourseData({...courseData, coverImg: file})
+                setFile={async(file)=>{
+                    let res = await uploadImageToCloudinary(file, (progress)=>{
+                        console.log("progressing", progress)
+                    })
+                    setCourseData({...courseData, coverImg: res})
                 }} 
                 imgPreview={imgPreview} 
                 type="image" 

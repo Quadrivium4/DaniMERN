@@ -3,6 +3,7 @@
     flex-direction: column;
     display: flex;
     overflow: auto;
+    padding: 20px;
 }
 .sections {
     display: flex;

@@ -91,12 +91,12 @@ body{
     color:rgba(255, 255, 255, 0.623)
 }
 input:-webkit-autofill {
-    -webkit-text-fill-color: rgb(255, 255, 255);
-    -webkit-box-shadow: 0 0 0px 1000px var(--extra-light) inset;
+    -webkit-text-fill-color: rgb(156, 156, 156);
+    -webkit-box-shadow: 0 0 0px 1000px #09272c inset;
 }
 input:-webkit-autofill:disabled {
-    -webkit-text-fill-color: rgb(161, 161, 161);
-    -webkit-box-shadow: 0 0 0px 100px rgb(78, 78, 94) inset;
+    /* -webkit-text-fill-color: rgb(161, 161, 161);
+    -webkit-box-shadow: 0 0 0px 100px rgb(78, 78, 94) inset; */
 }
 
 input{
@@ -106,8 +106,9 @@ input{
     padding: 10px 20px;
     margin-bottom: 10px;
     width: 100%;
-    background: var(--extra-light);
-    color: white;
+    background: #09272c;
+
+    color: rgb(202, 202, 202);
 }
 input:disabled{
     background: rgb(78, 78, 94);

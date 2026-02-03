@@ -36,7 +36,7 @@ const Store = () => {
                     store.map((course) => {
                         console.log(course);
                         return (
-                            <Link to={"/product"} state={course}>
+                            <Link to={"/checkout"} state={course}>
                                 <div key={course.id} className="product">
                                     <div className="cover">
                                         <img

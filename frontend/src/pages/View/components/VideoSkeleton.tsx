@@ -1,4 +1,4 @@
-import { height } from "pdfkit/js/page";
+
 import styles from "./VideoSkeleton.module.css";
 
 const VideoSkeleton = ({color, style}:{color?: string, style?: any}) => {
@@ -17,8 +17,8 @@ export const VideosSekeleton = ({i, color, style }: {i: number,color?: string, s
         <div>
             {Array.from(Array(i)).map(i=>{
                 j++;
-                console.log(j)
-                return <VideoSkeleton key={i} color={color} style={{...style, height:  (j == 3 || j == 5)? 40 : 60}}/>
+                //console.log(j)
+                return <VideoSkeleton key={"sekeleton" + j} color={color} style={{...style, height:  (j == 3 || j == 5)? 40 : 60}}/>
             })}
         </div>
         

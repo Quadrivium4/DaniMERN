@@ -148,6 +148,16 @@ const SubcourseSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+     hashedId: {
+        type: String,
+        required: true
+    },
+    promoVideo: {
+        type: String,
+    },
+    promoDescription: {
+        type: String
+    },
     coverImg: {
         type: Object,
         default: {}

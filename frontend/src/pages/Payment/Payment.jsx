@@ -9,7 +9,7 @@ import { useUser, useUserDispatch } from "../../Context.tsx";
 import Message from "../../components/Message";
 import Pop from "../../components/Pop";
 import Login from "../../components/Login";
-import { getPublicSubcourse, logout } from "../../controllers";
+import { getPublicSubcourse, getSubcourseData, logout } from "../../controllers";
 import { PayPalScriptProvider} from "@paypal/react-paypal-js";
 import "./Payment.css"
 import creditCards from "../../assets/icons/credit-cards.png";
@@ -40,7 +40,7 @@ function Payment(){
     const [duration, setDuration] = useState();
     const [videoNumber, setVideoNumber] = useState()
     useEffect(() =>{
-        getPublicSubcourse(item.id).then(res =>{
+        getSubcourseData(item.id).then(res =>{
             console.log("cicci", res);
             setDuration(res.data.duration);
             setVideoNumber(res.data.videoNumber)
@@ -77,10 +77,10 @@ function Payment(){
                                 alt={item.description}
                             ></img>
                             <div>
-                                <h3>{item.name}</h3>
+                                <h3><b>{item.name}</b></h3>
                                 <p>{item.description}</p>
-                                {videoNumber &&<p>number of videos: {videoNumber}</p>}
-                                {duration && <p>total duration: {(duration ).toFixed(0)} seconds</p>}
+                                {videoNumber &&<p>Numero di video: {videoNumber}</p>}
+                                {duration && <p>Durata totale: {(duration ).toFixed(0)} minuti</p>}
                             </div>
                            
 
@@ -96,7 +96,7 @@ function Payment(){
                                             <h4>{subcourse.name}</h4>
                                             <p>{subcourse.description}</p>
                                             <p>
-                                                Duration: {subcourse.duration}
+                                                Durata: {subcourse.duration}
                                             </p>
                                         </div>
                                     );
@@ -113,12 +113,7 @@ function Payment(){
                 {!isLogged && !loading ? (
                     <>
                         <h2>Registrati</h2>
-                        <p>
-                            Hai gia' un account?{" "}
-                            <button onClick={() => setLoginPop(true)}>
-                                Login
-                            </button>
-                        </p>
+                    
                         <div className="form">
                             <h3>Nome:</h3>
                             <input
@@ -185,6 +180,12 @@ function Payment(){
                                 </button>
                             )}
                         </div>
+                        <p style={{paddingTop: 10}}>
+                            Hai gia' un account?{" "}
+                            <span style={{color: "var(--extra-light)", cursor: "pointer"}} onClick={() => setLoginPop(true)}>
+                                Login
+                            </span>
+                        </p>
                     </>
                 ) : isLogged ? (
                     <>
@@ -227,7 +228,7 @@ function Payment(){
             </section>
             <section className="payment">
                 <h2>Pagamento</h2>
-                <p>Totale: <b>€{(item.price/100).toFixed(2)}</b> </p>
+                <h3>Totale: <b>€{(item.price/100).toFixed(2)}</b> </h3>
                 <div className="payment-options">
                     <PaymentOption
                         img={creditCards}
@@ -257,10 +258,10 @@ function Payment(){
                                 currency: "EUR",
                             }}
                         >
-                            <CouponValidation
+                            {/* <CouponValidation
                                 item={item}
                                 setCoupon={setCouponCode}
-                            ></CouponValidation>
+                            ></CouponValidation> */}
                             <Elements stripe={stripePromise}>
                                 {stripePromise &&
                                 paymentType === "credit-card" &&

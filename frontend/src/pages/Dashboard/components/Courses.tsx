@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { protectedUrl } from "../../../App";
 import FileUpload from "../../../components/FileUpload/FileUpload";
 import { useUser, useUserDispatch } from "../../../Context.tsx";
-import { deleteUser, getCourses, getSubcourse, getSubcourses, logout } from "../../../controllers";
+import { deleteUser, getCourses, getSubcourse, getSubcourses, logout, updateCourseProgress } from "../../../controllers";
 import CopyField from "./CopyField";
 import { useEffect, useRef, useState } from "react";
 import accountImg from "../../../assets/images/account-picture.png"
@@ -75,12 +75,22 @@ const Courses = () =>{
                     <div className="scroller">
                         {status === "loading"? <p>loading</p> : subcourses?.map((subcourse: any)=>{
                             return (
+                                <>
                                 <Link to={"/view/" + subcourse._id} state={{type: "subcourse", course: subcourse }}  key={subcourse._id}>
                                     <div className="subcourse" >
                                         <img src={subcourse.coverImg.url} alt="" />
                                         <h3 className="title">{subcourse.name}</h3>
                                     </div>
+                                    
                                 </Link>
+                                {/* <button onClick={()=>{
+                                        
+                                        // updateCourseProgress({
+                                        //     id: subcourse._id,
+                                        //     progress: 1
+                                        // })
+                                    }}>increas prog</button> */}
+                                    </>
                             )
                         })}
                     </div>

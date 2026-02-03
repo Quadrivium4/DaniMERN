@@ -1,5 +1,6 @@
 import React, { PropTypes, useEffect } from 'react'
 import styles from "./Video.module.css"
+import { updateCourseProgress } from '../controllers';
 /*const insertScriptHead = ({ name, src }) => {
   if (!document.querySelector(`#${name}`)) {
     const container = document.head || document.querySelector('head')
@@ -22,7 +23,7 @@ const wistiaScriptsHandler = (embedId) => {
   }))
 }*/
 
-const VideoPlayerEmbed= ({embedId, name})=>{
+const VideoPlayerEmbed= ({embedId, name, progress = 0, updateProgress = (time)=>{}, onEnded = (time) =>{}, })=>{
     useEffect(()=>{
      // console.log("size", size)
         let handle;
@@ -30,15 +31,42 @@ const VideoPlayerEmbed= ({embedId, name})=>{
         window._wq.push({
         id: embedId,
         onReady: (video) => {
-            handle = video
+            
+            console.log("readyyyy")
+            handle = video;
+            //video.time(progress)
+            console.log("hello", video);
+            video.bind("play", function() {
+                console.log("The video was just played!", progress);
+                video.time(progress + "s")
+            });
+            video.bind('end', ()=>{
+                onEnded(video.time());
+            })
+            video.bind('percentwatchedchanged', function (percent, lastPercent) {
+                //console.log("percentage changed:", percent,Math.round(video.time()));
+
+                if(Math.round(video.time()) % 5 != 0) return;
+                updateProgress(video.time())
+            });
+            // video.bind('play', function() {
+            //     video.time(progress);
+            //     return video.unbind;
+            // });
         },
         options: {
-            playerColor: "ff0000"
+            playerColor: "0e3c43",
+            time: progress,
+
         }
         })
         //wistiaScriptsHandler(embedId)
         handle && handle.remove()
     },[])
+    useEffect(()=>{
+        console.log("hello progress", {progress})
+    }
+    , [progress])
     // return (
     //     <div
     //         className="video"
@@ -78,14 +106,19 @@ const VideoPlayerEmbed= ({embedId, name})=>{
                        maxWidth: "calc(((100cqh - 200px) / 9) * 16)",
                    }}
                >
-                   <iframe
-                       src={`https://fast.wistia.net/embed/iframe/${embedId}?videoFoam=true&fitStrategy=contain&playerColor=0e3c43`}
+                <div id='overlay'>
+                    <div id='loader'></div>
+                </div>
+                <div className={`wistia_embed wistia_async_${embedId} videoFoam=true autoPlay=false  playerColor=0e3c43 wtime=${progress} ${styles.ifr}`}
+                    >&nbsp;</div>
+                   {/* <iframe
+                       src={`https://fast.wistia.net/embed/iframe/${embedId}?videoFoam=true&fitStrategy=contain&playerColor=0e3c43&wtime=${progress}`}
                        className={styles.ifr}
                        style={{
                            aspectRatio: 16 / 9,
                            height: "100%",
                        }}
-                   ></iframe>
+                   ></iframe> */}
                </div>
                <h1
                    style={{
@@ -140,7 +173,7 @@ const VideoPlayerEmbed= ({embedId, name})=>{
     //         </div>
     //         </div>
     //     </div>
-    // )
+    //)
 
 }
 //const VideoPlayerEmbed = () =>{ return (<h1>Hello</h1>)}

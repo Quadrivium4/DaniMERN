@@ -37,7 +37,7 @@ const Settings = () =>{
                         <div className="info">
                             <FileUpload setFile={uploadImage} filePreview={profileImgPreview} >
                                 {
-                                    info.profileImg.url?
+                                    info.profileImg?.url?
                                     <img ref={profileImgPreview} src={info.profileImg.url} alt="profile img"></img> :
                                     <img ref={profileImgPreview} src={accountImg} alt="profile img"></img>
                                 }
@@ -74,9 +74,9 @@ const Settings = () =>{
                             </div>
                             
                         </div>
-                        <h2>Affilate</h2>
+                        {/* <h2>Affilate</h2>
                         { info.paypalId ? <p>Affiliate coupon:</p> : <p>You must have an account PayPal connected</p>}
-                        { info.paypalId ? <CopyField textToCopy={info._id} />: null }
+                        { info.paypalId ? <CopyField textToCopy={info._id} />: null } */}
                         
                     </div>
     )

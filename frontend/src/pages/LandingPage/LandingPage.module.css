@@ -1,0 +1,16 @@
+.page{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    height: 100%;
+}
+.page h1{
+    font-weight: 700;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    text-transform: uppercase;
+}
+.page button{
+    margin-top: 10px;
+}
