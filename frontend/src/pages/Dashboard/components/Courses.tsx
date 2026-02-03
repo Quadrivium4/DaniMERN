@@ -53,7 +53,7 @@ const Courses = () =>{
     };
     return (
         <div id="purchases" className="section">
-                <h1>Aquisti</h1>
+                <h1>Acquisti</h1>
                 {/* <h2>Corsi</h2>
                 <div className="scroller-wrap">
                     <div className="scroller">

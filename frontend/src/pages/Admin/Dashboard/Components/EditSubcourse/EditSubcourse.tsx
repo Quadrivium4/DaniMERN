@@ -110,6 +110,9 @@ export const EditSubcourse = () =>{
     useEffect(()=>{
         console.log("sub videos", subcourseVideos)
     },[subcourseVideos])
+    useEffect(()=>{
+        console.log("sub course data changed", subcourseData)
+    },[subcourseData])
     useEffect(() =>{
         console.log({subcourse})
         if(!subcourse?._id) return;
@@ -153,6 +156,7 @@ export const EditSubcourse = () =>{
     const handleEdit = async() =>{
      
         if(action === "update"){
+            console.log({subcourseData})
             updateSubcourse(subcourseData).then(res =>console.log("hello update res", res))
         }else if(action === "create"){
             console.log("creating..");
