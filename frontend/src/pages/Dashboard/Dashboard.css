@@ -11,6 +11,7 @@
     height: 100%;
     padding: 30px;
     gap: 20px;
+    overflow: auto;
 }
 #dashboard .section {
     background-color: var(--dark);
@@ -132,6 +133,7 @@
     display: flex;
     flex-direction: column;
     padding: 5px;
+    gap: 10px;
     width: 100%;
 }
 #dashboard #user .info .FileUpload{
@@ -147,14 +149,10 @@
     object-fit: cover;
     
 }
-#dashboard #user button {
-    margin-top: 10px;
-}
 #dashboard #purchases .scroller{
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
     gap: 10px;
     background: var(--dark);
 }
@@ -179,6 +177,11 @@
     min-width: 180px;
     max-width: 300px;
     width: 100%;
+    border: 1px solid var(--extra-light);
+}
+#dashboard .subcourse h2{
+    text-transform: uppercase;
+    padding: 10px;
 }
  #dashboard .course img{
     width: 100%;
@@ -187,4 +190,16 @@
     width: 100%;
     min-width: 100px;
     /* max-width: 250px; */
+}
+@media (max-width: 600px) {
+    #dashboard {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 30px;
+    gap: 20px;
+}
+#dashboard #purchases {
+    min-height: 400px;
+}
 }

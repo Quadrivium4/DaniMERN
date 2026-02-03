@@ -28,7 +28,7 @@ const LandingPage = () =>{
                     
                        style={{
                            aspectRatio: 16 / 9,
-                           maxHeight: "calc(100% - 150px)",
+                           maxHeight: "calc(100% - 200px)",
                            borderRadius: 25
                        }}
                    ></iframe> 

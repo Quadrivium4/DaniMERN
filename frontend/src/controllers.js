@@ -16,6 +16,9 @@ const register = async(name, email, password)=> {
             password
         })
 }
+const verify = async(token) =>{
+    
+}
 const getFile = (id) =>{
     return (baseUrl + "/files/" + id);
 }

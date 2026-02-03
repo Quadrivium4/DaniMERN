@@ -76,11 +76,11 @@ function Payment(){
                                 src={item.coverImg.url}
                                 alt={item.description}
                             ></img>
-                            <div>
+                            <div className="text">
                                 <h3><b>{item.name}</b></h3>
                                 <p>{item.description}</p>
-                                {videoNumber &&<p>Numero di video: {videoNumber}</p>}
-                                {duration && <p>Durata totale: {(duration ).toFixed(0)} minuti</p>}
+                                {videoNumber &&<p style={{paddingTop: 10}}><b>Numero di video: {videoNumber}</b></p>}
+                                {duration && <p><b>Durata totale: {(duration ).toFixed(0)} minuti</b></p>}
                             </div>
                            
 
@@ -168,11 +168,15 @@ function Payment(){
                                     onClick={async () => {
                                         let err = await validateCredentials();
                                         console.log(err);
-                                        if (err)
+                                        if (err){
+                                            setTimeout(()=>setMessage(null), 3000)
                                             return setMessage({
                                                 content: err.message,
                                                 type: "error",
                                             });
+                                            
+                                        }
+                                            
                                         setIsSubmitted(true);
                                     }}
                                 >

@@ -4,8 +4,11 @@ import FileUpload from "../../../components/FileUpload/FileUpload.tsx";
 import { useUser, useUserDispatch } from "../../../Context.tsx";
 import { deleteUser, logout } from "../../../controllers";
 import CopyField from "./CopyField";
-import { useRef } from "react";
+import { ReactNode, useRef, useState } from "react";
 import accountImg from "../../../assets/images/account-picture.png"
+import { uploadImageToCloudinary } from "../../../u.ts";
+import axios from "axios";
+import Pop from "../../../components/Pop.jsx";
 
 const Settings = () =>{
     const dispatch = useUserDispatch();
@@ -13,26 +16,24 @@ const Settings = () =>{
     const user = useUser();
     const {info} = user;
     const profileImgPreview = useRef(null);
+    const [pop,setPop] = useState<ReactNode>(null);
 
-    const uploadImage = (img: File) => {
+    const uploadImage = async(img: File) => {
+        const res = await uploadImageToCloudinary(img);
+
         const formData = new FormData();
-        formData.append("file", img);
-        formData.append("type", "video");
-        fetch(protectedUrl + "/user/upload", {
-            //withCredentials: true,
-            credentials: "include",
-            method: "POST",
-            body: formData,
+   
+        axios.post(protectedUrl + "/user/upload", {
+            profileImg: res
+        }, {withCredentials: true}).then(res => {
+            console.log(res.data)
+            dispatch({type: "SET_INFO", value: res.data})
         })
-            .then((res) => res.json())
-            .then(({ fileId }) => {
-                console.log(fileId);
-                const newUser = { ...info, profileImg: fileId };
-                dispatch({ type: "SET_INFO", value: newUser });
-            });
+           
     };
     return (
         <div id="user" className="section">
+            {pop && <Pop toggle={()=>setPop(null)}>{pop}</Pop>}
                         <h1>Dati Utente</h1>
                         <div className="info">
                             <FileUpload setFile={uploadImage} filePreview={profileImgPreview} >
@@ -60,16 +61,23 @@ const Settings = () =>{
                                 }
                                 }}>log out</button>
                                 <button onClick={async()=>{
-                                let data = await deleteUser();
-                                console.log("delete user data",data)
-                                if(data.ok){
-                                    console.log("redirecting")
-                                    //redirect("/");
-                                    dispatch({type: "RESET", value: null});
-                                    navigate("/", {replace: true})
-                                }else{
-                                    console.log(data.message)
-                                }
+                                    setPop(<>
+                                    <h2>Eliminazione account</h2>
+                                    <p>Sei sicuro di voler eliminare l'account? tutti i tuoi dati e i tuoi corsi andranno persi.</p>
+                                    <button onClick={async()=>{
+                                        let data = await deleteUser();
+                                        console.log("delete user data",data)
+                                        if(data.ok){
+                                            console.log("redirecting")
+                                            //redirect("/");
+                                            dispatch({type: "RESET", value: null});
+                                            navigate("/", {replace: true})
+                                        }else{
+                                            console.log(data.message)
+                                        }
+                                    }}>Procedi con l'eliminazione</button>
+                                    </>)
+                                
                                 }}>Delete account</button>
                             </div>
                             

@@ -3,6 +3,7 @@
     gap: 20px;
     padding: 20px;
     flex-direction: row;
+    overflow: auto;
 }
 #checkout section{
     width: 100%;
@@ -26,12 +27,19 @@
     margin-bottom: 10px;
 }
 #checkout .course-info{
-
+    overflow: auto;
     align-items: center;
+    
+}
+#checkout .course-info h3{
+    text-transform: uppercase;
 }
 #checkout .course-info img{
     width: 100%;
     max-width: 400px;
+}
+#checkout .course-info .text{
+    padding: 10px 0px;
 }
 #checkout .data .register {
     display: flex;

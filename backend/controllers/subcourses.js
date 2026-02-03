@@ -45,6 +45,7 @@ const getPublicSubcourse =  async (req, res) => {
             coverImg: subcourse.coverImg,
             promoVideo: subcourse.promoVideo,
             promoDescription: subcourse.promoDescription,
+            description: subcourse.description,
             name: subcourse.name,
             price: subcourse.price
         });

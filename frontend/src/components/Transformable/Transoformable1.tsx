@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./Transformable.module.css"
-import { set } from "mongoose";
 const near = 10;
 const resizePoint = {
     top: {

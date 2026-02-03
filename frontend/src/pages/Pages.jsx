@@ -13,6 +13,8 @@ import { EditSubcourse } from "./Admin/Dashboard/Components/EditSubcourse/EditSu
 import PrivacyPolicy from "./PrivacyPolicy/PrivacyPolicy.tsx";
 import TermsOfUse from "./TermsOfUse/TermsOfUse.tsx";
 import LandingPage from "./LandingPage/LandingPage.tsx";
+import VerificationSuccessful from "./VerificationSuccessful/VerificationSuccessful.tsx";
+import VerificationError from "./VerificationError/VerificationError.tsx";
 
 const Pages = () =>{
     const {isLogged, info, loading }= useUser();
@@ -35,6 +37,14 @@ const Pages = () =>{
              <Route
                 path="/landing-page/:id"
                 element={<LandingPage />}
+            ></Route>
+            <Route
+                path="/verification-successful/:id"
+                element={<VerificationSuccessful />}
+            ></Route>
+            <Route
+                path="/verification-error"
+                element={<VerificationError />}
             ></Route>
             <Route path="/store" element={<Store />}></Route>
             {isLogged && info.role === "admin" ? (

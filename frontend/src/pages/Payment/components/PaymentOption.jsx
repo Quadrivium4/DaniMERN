@@ -5,7 +5,11 @@ const PaymentOption = ({img, setPaymentType, currentPaymentType, paymentType, na
     let backgroundColor = paymentType === currentPaymentType ?"var(--light)": null;
     const handleClick = () =>{
         console.log(isSubmitted)
-        if(!isSubmitted && !isLogged) return setMessage({content: "Registrati!", type: "error"});
+       
+        if(!isSubmitted && !isLogged) {
+             setTimeout(()=>setMessage(null), 3000)
+            return setMessage({content: "Registrati!", type: "error"});
+        }
         setPaymentType(paymentType);
     }
     return (

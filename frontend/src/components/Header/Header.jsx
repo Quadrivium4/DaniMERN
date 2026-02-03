@@ -60,7 +60,9 @@ const Header1 = () => {
 
     return (
         <div id="header">
+                <Link to="/store">
                 <h1>Video Academy</h1>
+                </Link>
                 <div className="profile">
 
 

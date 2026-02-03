@@ -149,7 +149,7 @@ const View = () => {
 }
 const ViewContent= ({courseId}:{courseId: string}) =>{
     const {videos, loading, currentVideo, nextVideo, progress} = useVideo()
-
+ 
     const location = useLocation();
     const {id} = useParams();
     console.log({location})
@@ -169,7 +169,7 @@ const ViewContent= ({courseId}:{courseId: string}) =>{
         <div id="view" className="page">
             {/* <div style={{flexDirection: "row", display: "flex", height: "100%", justifyContent: "center", gap: 10, maxWidth: 1800, width: "100%"}}> */}
             <div className={"view-content"}>
-            <Sidebar />
+            <Sidebar  />
     
                 {loading? <VideoSkeleton />: null}
                 {currentVideo && !loading? 

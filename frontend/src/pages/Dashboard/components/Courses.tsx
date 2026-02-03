@@ -79,7 +79,7 @@ const Courses = () =>{
                                 <Link to={"/view/" + subcourse._id} state={{type: "subcourse", course: subcourse }}  key={subcourse._id}>
                                     <div className="subcourse" >
                                         <img src={subcourse.coverImg.url} alt="" />
-                                        <h3 className="title">{subcourse.name}</h3>
+                                        <h2 className="title"><b>{subcourse.name}</b></h2>
                                     </div>
                                     
                                 </Link>
@@ -96,7 +96,7 @@ const Courses = () =>{
                     </div>
                 </div>
                 <Link to="/store">
-                    <button>New Course</button>
+                    <p style={{paddingTop: 10}}>Acquista altri corsi</p>
                 </Link>
             </div>
     )

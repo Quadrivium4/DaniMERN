@@ -15,10 +15,11 @@ const Login = ({toggle}) =>{
     const handleLogin = async() =>{
         setLoading(true);
         console.log(email, password);
+        try {
         const data = await login(email, password);
         console.log(data);
         
-        if(data.ok){
+
             setMessage({
                 type: "success",
                 content: data.message
@@ -27,29 +28,36 @@ const Login = ({toggle}) =>{
             dispatch({type: "SET_LOGGED", value: true});
             dispatch({type: "SET_INFO", value: data.user});
             console.log(location.pathname)
-            if(location.pathname === "/store"){
+            //if(location.pathname === "/store" || location.pathname.startsWith("veri")){
                 navigate("/dashboard", {replace: true});
-            }
+            //}
             toggle();
-        }else{
-            setMessage({
-                type: "error",
-                content: data.message
-            });
-        }
         
-        setLoading(false);
+        } catch (error) {
+             setMessage({
+                type: "error",
+                content: error.message
+            });
+            setTimeout(()=>setMessage(null), 3000)
+        } finally{
+            setLoading(false);
+        }
+
+
+           
+     
+        
 
     }
     return(
             <>
-                <h1>Login</h1>
-                {message? <Message type={message.type} content={message.content} />: null}
+                <h2>Login</h2>
+                {message?<div style={{marginBottom: 10}}><Message type={message.type} content={message.content} /></div> : null}
                 <input type="email" placeholder="email" value={email} 
                 onChange={(e)=>setEmail(e.target.value) }/>
                 <input type="password" placeholder="password" value={password} 
                 onChange={(e) => { setPassword(e.target.value); }}/>
-                <button id="login" onClick={handleLogin}>{loading ? <>Loading..</> : <>Submit</>}</button>
+                <button id="login" onClick={handleLogin}>{loading ? <>Loading..</> : <>Invio</>}</button>
             </>
     )
 }

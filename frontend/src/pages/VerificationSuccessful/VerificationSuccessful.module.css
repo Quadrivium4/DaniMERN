@@ -1,0 +1,31 @@
+.page {
+    display: flex;
+    align-items: center;
+}
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 1000px;
+    padding: 20px;
+    width: 100%;
+}
+.content h1{
+    text-transform: uppercase;
+    font-size: 26px;
+    font-weight: 300;
+    padding: 0;
+    margin: 0;
+}
+.product {
+    max-width: 300px;
+    border: 1px solid var(--extra-light);
+    padding: 10px;
+}
+.product img{
+    width: 100%;
+    object-fit: cover;
+}
+.content button{
+    max-width: 200px;
+}

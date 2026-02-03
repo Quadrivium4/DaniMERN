@@ -1,0 +1,12 @@
+.page {
+    display: flex;
+    align-items: center;
+}
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 1000px;
+    padding: 20px;
+    width: 100%;
+}

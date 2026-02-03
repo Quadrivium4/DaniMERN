@@ -8,12 +8,73 @@ import Select from "../../../components/Select/Select.tsx";
 import { VideosSekeleton } from "./VideoSkeleton.tsx";
 import { useVideo } from "../VideoContext.tsx";
 
+const offset = 10;
 const Sidebar = () =>{
     //console.log("sidebar videos", videos);
     const {videos, currentSection, setVideo, loading, currentVideo, } = useVideo()
+    const [sidebarWidth, setSidebarWidth] = useState(200);
+    const sidebarRef = useRef<HTMLDivElement>(null);
+    const mouseRef = useRef<{position: number, down: boolean}>({position: 0, down: false})
+    const [cursor, setCursor] = useState<string>("");
+    const mouseDownHandler = (e: MouseEvent) => {
+        console.log("mouse down")
+        if(!sidebarRef.current) return;
+         if(
+            e.clientX < sidebarRef.current.offsetLeft + sidebarRef.current.clientWidth + offset && 
+            e.clientX > sidebarRef.current.offsetLeft + sidebarRef.current.clientWidth - offset
+        ){
+            mouseRef.current.down = true;
+        }
+    }
+    const mouseUpHandler = (e: MouseEvent) => { 
+         console.log("mouse down")
+        if(document.documentElement.style.pointerEvents == "none") document.documentElement.style.pointerEvents = "all";
+        mouseRef.current.down = false;
+    }
+    const onMouseMove = (e: MouseEvent) =>{
+        //console.log("mouse moving");
+        if(!sidebarRef.current) return;
+        if(mouseRef.current.down){
+            document.documentElement.style.pointerEvents = "none";
+            let width= e.clientX - sidebarRef.current.offsetLeft;
+            console.log("hello", width )
+            if(width > 500 || width < 100) return;
+            // if(sidebarRef.current.offsetLeft > 16 && e.clientX -sidebarRef.current.offsetLeft < sidebarRef.current.clientWidth) return
+            setSidebarWidth(width);
+            //setSidebarWidth(100);
+        }
 
+        else if(
+            e.clientX < sidebarRef.current.offsetLeft + sidebarRef.current.clientWidth + offset && 
+            e.clientX > sidebarRef.current.offsetLeft + sidebarRef.current.clientWidth - offset
+        ){
+        
+                setCursor("ew-resize");
+                console.log("near", mouseRef.current.down)
+                document.documentElement.style.cursor = "ew-resize";
+                if(document.documentElement.style.pointerEvents == "none") document.documentElement.style.pointerEvents = "all";
+       
+            
+           
+        }else{
+            if(document.documentElement.style.cursor == "ew-resize") {
+                document.documentElement.style.cursor = "";
+                
+            }
+        }
+    }
+    useEffect(()=>{
+        window.addEventListener("mousemove", onMouseMove)
+        window.addEventListener("mousedown", mouseDownHandler)
+        window.addEventListener("mouseup", mouseUpHandler)
+        return ()=>{
+            window.removeEventListener("mousemove", onMouseMove)
+            window.removeEventListener("mousedown", mouseDownHandler)
+            window.addEventListener("mouseup", mouseUpHandler)
+        }
+    },[])
     return (
-        <div className={styles.sidebar}>
+        <div className={styles.sidebar} ref={sidebarRef} style={{width: sidebarWidth}}>
             <Search videos={videos} onResult={({video, section})=>{
                 
                 setVideo(section, video);
@@ -33,18 +94,18 @@ const Sidebar = () =>{
                     })
                 }
             </div>
-            <SectionsScoller />
+            <SectionsScoller width={sidebarWidth} />
 
             
         </div>
     )
 
 }
-const SectionsScoller = () =>{
+const SectionsScoller = ({width}: {width: number} ) =>{
     const {currentSection, setSection: setCurrentSection, videos, previousSection, nextSection} = useVideo()
     const sections = Object.keys(videos);
     const ref = useRef<HTMLDivElement>(null);
-     const sectionWidth = 200;
+     const sectionWidth = width - 60;
      const index = sections.indexOf(currentSection) ;
      useEffect(()=>{
         ref.current?.scrollTo({left: (sections.indexOf(currentSection) * sectionWidth ), behavior: "smooth"})

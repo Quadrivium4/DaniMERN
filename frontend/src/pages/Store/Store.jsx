@@ -44,14 +44,16 @@ const Store = () => {
                                             alt="course-img"
                                             src={course.coverImg.url}
                                         />
-                                        <h2>{course.name}</h2>
-                                        <h2 id="price">
-                                            €{(course.price / 100).toFixed(2)}
-                                        </h2>
+                                        
+                                        
                                         <div id="layer"></div>
                                     </div>
                                     <div className="details">
-                                        <p>{course.description}</p>
+                                        <h2 className="course-name">{course.name}</h2>
+                                        <p>{course.description.slice(0,20)}{course.description.length > 20? "...": null}</p>
+                                        <h2 id="price">
+                                            €{(course.price / 100).toFixed(2)}
+                                        </h2>
                                     </div>
                                 </div>
                             </Link>

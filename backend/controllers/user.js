@@ -7,7 +7,7 @@ const fs = require("fs");
 const SALT_ROUNDS = 10;
 const { validateEmail, sendMail, getNewFileName, uploadWistiaVideo, getSubcourseIds} = require("../utils");
 const {deleteFile, getFile, saveFile} = require("../utils/files");
-const {deleteCustomer} = require("../utils/stripe");
+const {deleteStripeCustomer} = require("../utils/stripe");
 const { subscribe } = require("diagnostics_channel");
 
 const login = async (req, res) => {
@@ -54,18 +54,19 @@ const login = async (req, res) => {
     }
 }
 const uploadUserImg = async(req, res) =>{
+    console.log("uploadin profile img", req.body)
     const user = req.user;
     const email = user.email;
-    console.log(req.files);
-    const file = await saveFile(req.files.file);
+    const {profileImg} = req.body;
+    
     const newUser = await User.findOneAndUpdate({ email }, {
-        profileImg: file
+        profileImg: profileImg
     }, {
         new: true
     });
     if (user.profileImg) await deleteFile(user.profileImg);
     console.log(newUser);
-    res.send({file})
+    res.send(newUser)
 }
 const uploadUserVideo = async (req, res) => {
     const email = req.session.userEmail;
@@ -264,7 +265,7 @@ const deleteUser = async(req, res) =>{
         deleteFile(review.pdf)
     })
     const deletedReviews = await Review.deleteMany({ _id: { $in: user.reviews } });
-    const deletedCustomer = await deleteCustomer(user.stripeId);
+    const deletedCustomer = await deleteStripeCustomer(user.stripeId);
 
     req.session.destroy(err => {
         if (err) {
@@ -287,6 +288,7 @@ const updateUserCourseProgress = async(req, res) =>{
     console.log(updatedUser)
     res.send(updatedUser);
 }
+
 module.exports = {
     login,
     getUser,

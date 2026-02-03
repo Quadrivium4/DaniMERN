@@ -1,9 +1,14 @@
 #store{
     flex-direction: column;
+    align-items: center;
+    padding: 20px;
 }
 #store #products {
-    display: flex;
+    display: grid;
     position: relative;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    max-width: 900px;
 }
 
 #store .product{
@@ -12,24 +17,26 @@
     width: 100%;
     height: 100%;
     position: relative;
+    max-width: 300px;
+    border: 1px solid var(--extra-light);
 }
 #store .cover {
     display: flex;
     width: 100%;
     height: 100%;
-    position: relative;
 }
 #store .product #layer {
     height: 100%;
     width: 100%;
     box-shadow: inset 0px 0px 5vw black;
     position: absolute;
-    display: none;
+    transition: 0.3s;
+    opacity: 0;
     top: 0;
     left: 0;
 }
 #store .product:hover #layer{
-    display: flex;
+    opacity: 1;
 }
 #store .product:hover a .title {
     transform: scale3d(1.05);
@@ -37,16 +44,17 @@
 #store .product img{
 
 } 
-#store .product h2 {
-    position:  absolute;
-    padding: 20px;
-    top: 0;
-    font-size: 8vw;
+#store .product .details {
+    
+    padding: 10px;
+}
+#store .product .details .course-name{
+    text-transform: uppercase;
+    font-weight: 300;
 }
 #store .product #price {
-    position: absolute;
-    top: 45%;
-    font-size: 4vw;
+   font-size: 20px;
+    text-align: end;
 }
 #store .product .course-img{
     width: 100%;

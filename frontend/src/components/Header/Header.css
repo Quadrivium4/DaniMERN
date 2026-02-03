@@ -48,6 +48,7 @@
     font-weight: 900;
     margin-bottom: 0;
     color: var(--medium);
+    cursor: pointer;
 }
 #header .profile{
     width: 50px;
@@ -65,4 +66,9 @@
     opacity: 50%;
     transition: all 0.2s ease-in-out;
     cursor: pointer;
+}
+#header  #pop-body h2{
+    color: white;
+    font-weight: 400;
+    padding-bottom: 10px;
 }

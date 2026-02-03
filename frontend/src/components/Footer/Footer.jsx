@@ -1,7 +1,9 @@
+import { useLocation } from "react-router-dom";
 import "./Footer.css"
 const Footer = ()=>{
+    let location = useLocation()
     return (
-        <div id="footer">
+        <div id="footer" style={{display: location.pathname.startsWith("/landing-page")? "none": "flex"}}>
             <div id="contact">
                 {/* <p>Daniele Giacobbe</p> */}
                 <p>Email: danielegiacobbe04@gmail.com</p>
