@@ -198,7 +198,7 @@ const uploadSubcourseCover = async(req, res) => {
 const putSubcourse = async (req, res) => {
     console.log("body",req.body);
     //console.log("files", req.files);    
-    const { name, description, price, hashedId, id, promoVideo, promoDescription } = req.body;
+    const { name, description, price, hashedId, id, promoVideo, promoDescription, coverImg } = req.body;
 
     let user = req.user;
     if(user.role !== "admin") throw new AppError(1, 403, "You are not an admin");
@@ -209,6 +209,7 @@ const putSubcourse = async (req, res) => {
         description,
         price,
         hashedId,
+        coverImg,
         promoDescription,
         promoVideo
     })
