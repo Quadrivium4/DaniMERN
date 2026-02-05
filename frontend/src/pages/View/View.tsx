@@ -7,7 +7,7 @@ import { useUser, useUserDispatch } from "../../Context.tsx";
 import "./View.css"
 import Sidebar from "./components/Sidebar.tsx";
 import VideoSkeleton from "./components/VideoSkeleton.tsx";
-import { createSubcourseVideos, TSubcourseVideos, TVideo } from "../Admin/Dashboard/Components/EditSubcourse/EditSubcourse.tsx";
+import { createSubcourseVideos, TSubcourse, TSubcourseVideos, TVideo } from "../Admin/Dashboard/Components/EditSubcourse/EditSubcourse.tsx";
 import { useVideo, VideoProvider } from "./VideoContext.tsx";
 
 
@@ -148,8 +148,9 @@ const View = () => {
     )
 }
 const ViewContent= ({courseId}:{courseId: string}) =>{
-    const {videos, loading, currentVideo, nextVideo, progress} = useVideo()
- 
+    const {videos, loading, currentVideo, nextVideo, progress, setProgress} = useVideo()
+    const dispatch = useUserDispatch()
+    const user =useUser()
     const location = useLocation();
     const {id} = useParams();
     console.log({location})
@@ -174,18 +175,33 @@ const ViewContent= ({courseId}:{courseId: string}) =>{
                 {loading? <VideoSkeleton />: null}
                 {currentVideo && !loading? 
                 <Video embedId={currentVideo.hashed_id} key={currentVideo.hashed_id} name={currentVideo.name} progress={currentVideo.progress} updateProgress={(time: number)=>{
-                    if(time < currentVideo.progress) return;
-                    console.log("really updating progress", progress, time - currentVideo.progress);
-  
+                    if(time < progress) return;
+                    let newProgress = currentVideoTime(videos, currentVideo.hashed_id) + time;
+                    console.log("really updating progress", newProgress);
+                    setProgress(newProgress)
                     updateCourseProgress({
                         id: courseId,
-                        progress: currentVideoTime(videos, currentVideo.hashed_id) + time
+                        progress: newProgress
                     })
+                    const newSubcourses = user.subcourses.map((s: TSubcourse) =>{
+                        if(s.id === courseId){
+                            return {...s, progress: newProgress}
+                        }
+                    })
+                    dispatch({type: "SET_SUBCOURSES", value: newSubcourses})
                 } } onEnded={(time: number)=>{
+                    let newProgress = currentVideoTime(videos, currentVideo.hashed_id) + time;
                     updateCourseProgress({
                         id: courseId,
-                        progress: currentVideoTime(videos, currentVideo.hashed_id) + time
+                        progress: newProgress
                     })
+                    setProgress(newProgress)
+                    const newSubcourses = user.subcourses.map((s: TSubcourse) =>{
+                        if(s.id === courseId){
+                            return {...s, progress: newProgress}
+                        }
+                    })
+                    dispatch({type: "SET_SUBCOURSES", value: newSubcourses})
                     nextVideo();
                 }}/>: null}
             {/* </div> */}

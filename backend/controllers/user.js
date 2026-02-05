@@ -154,6 +154,7 @@ const getUser = async (req, res) => {
             let sub = user.subcourses.find(val => val.id == s.id);
             return {
                 ...s.toObject(),
+                id: s._id,
                 progress: sub.progress
             }
         })

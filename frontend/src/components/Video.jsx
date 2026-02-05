@@ -38,7 +38,11 @@ const VideoPlayerEmbed= ({embedId, name, progress = 0, updateProgress = (time)=>
             console.log("hello", video);
             video.bind("play", function() {
                 console.log("The video was just played!", progress);
-                video.time(progress + "s")
+                //video.time(progress + "s")
+            });
+            video.bind("pause", function() {
+                console.log("The video was just played!", progress);
+                updateProgress(video.time())
             });
             video.bind('end', ()=>{
                 onEnded(video.time());

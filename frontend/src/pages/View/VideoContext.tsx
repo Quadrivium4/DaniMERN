@@ -21,7 +21,8 @@ type VideoContextProps = VideoStateProps & {
     nextSection: () =>void,
     previousSection: () =>void,
     setSection: (section: string) =>void,
-    setVideo: (section: string, video: TVideo) =>void
+    setVideo: (section: string, video: TVideo) =>void,
+    setProgress: (progress: number) => void
 } | null
 const VideoContext = createContext<VideoContextProps>(null);
 
@@ -145,8 +146,12 @@ const VideoProvider = ({ children, id }: {children: ReactNode, id: string}) => {
         let video = state.videos[previousSection][videoIds[0]];
         setState({...state, currentSection: previousSection, currentVideo: video})
     }
+    const setProgress = (progress: number) =>{
+        setState({...state, progress})
+    }
+    
     return (
-        <VideoContext.Provider value={{ ...state, setSection, setVideo, previousSection, nextSection, nextVideo, previousVideo}}>
+        <VideoContext.Provider value={{ ...state, setSection, setVideo, previousSection, nextSection, nextVideo, previousVideo, setProgress}}>
             {children}
         </VideoContext.Provider>
     );

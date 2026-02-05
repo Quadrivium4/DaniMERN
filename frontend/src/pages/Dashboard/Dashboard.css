@@ -191,6 +191,34 @@
     min-width: 100px;
     /* max-width: 250px; */
 }
+#dashboard .subcourse .progress-bar{
+    width: 100%;
+    height: 10px;
+    background-color: var(--medium);
+    position: relative;
+    overflow: hidden;
+}
+#dashboard .subcourse .progress-bar .progress{
+    height: 10px;
+    background-color: var(--extra-light);
+    transition: 0.5s;
+}
+#dashboard .subcourse .progress-bar .progress.loading {
+    opacity: 1;
+    animation: slide 0.75s ease-in-out infinite;
+    background-color: transparent;
+    box-shadow: 0 0 40px 6px var(--extra-light);
+    width: 0;
+    position: absolute;
+}
+@keyframes slide {
+    0%{
+        left: -100px;
+    }
+    100%{
+        left: 100%;
+    }
+}
 @media (max-width: 600px) {
     #dashboard {
     display: flex;

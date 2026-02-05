@@ -63,6 +63,8 @@ const getSubcourse = async (req, res) => {
     let data = await requestCourseData(subcourse.hashedId);
     if(user.role !== "admin"){
         let progressSubcourse = user.subcourses.find(val => subcourse.id == val.id);
+        let duration = data.medias.reduce((prev, current)=> prev +=current.duration);
+        console.log("duration",{duration})
         res.send({
             ok: true,
             message: "You got it",
@@ -71,7 +73,8 @@ const getSubcourse = async (req, res) => {
                 files: subcourse.files,
                 course: {
                     ...subcourse.toObject(),
-                    progress: progressSubcourse.progress
+                    progress: progressSubcourse.progress,
+                    total: duration
                 }
             }
         });

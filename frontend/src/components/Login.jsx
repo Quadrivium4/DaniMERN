@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {redirect, useNavigate, useLocation} from "react-router-dom";
+import {redirect, useNavigate, useLocation, Link} from "react-router-dom";
 import {useUserDispatch} from "../Context.tsx";
 import { login } from "../controllers";
 import Message from "./Message";
@@ -12,6 +12,7 @@ const Login = ({toggle}) =>{
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState();
+    const [resetPassword, setResetPassword] = useState(false);
     const handleLogin = async() =>{
         setLoading(true);
         console.log(email, password);
@@ -49,7 +50,51 @@ const Login = ({toggle}) =>{
         
 
     }
-    return(
+     const handleResetPassword= async() =>{
+        setLoading(true);
+        console.log(email, password);
+        try {
+        const data = await resetPassword(email, password);
+        console.log(data);
+        
+
+            setMessage({
+                type: "success",
+                content: data.message
+            });
+            
+            dispatch({type: "SET_LOGGED", value: true});
+            dispatch({type: "SET_INFO", value: data.user});
+            console.log(location.pathname)
+            //if(location.pathname === "/store" || location.pathname.startsWith("veri")){
+                navigate("/dashboard", {replace: true});
+            //}
+            toggle();
+        
+        } catch (error) {
+             setMessage({
+                type: "error",
+                content: error.message
+            });
+            setTimeout(()=>setMessage(null), 3000)
+        } finally{
+            setLoading(false);
+        }
+
+
+           
+     
+        
+
+    }
+    return( resetPassword? <>
+            <h2>Reset Password</h2>
+                <input type="email" placeholder="email" value={email} 
+                onChange={(e)=>setEmail(e.target.value) }/>
+                <input type="password" placeholder="new password" value={password} 
+                onChange={(e) => { setPassword(e.target.value); }}/>
+                <button id="login" onClick={handleResetPassword}>{loading ? <>Loading..</> : <>Invio</>}</button>
+            </>:
             <>
                 <h2>Login</h2>
                 {message?<div style={{marginBottom: 10}}><Message type={message.type} content={message.content} /></div> : null}
@@ -58,6 +103,7 @@ const Login = ({toggle}) =>{
                 <input type="password" placeholder="password" value={password} 
                 onChange={(e) => { setPassword(e.target.value); }}/>
                 <button id="login" onClick={handleLogin}>{loading ? <>Loading..</> : <>Invio</>}</button>
+                <p>Hai dimenticato la password? <span onClick={()=>setResetPassword(true)} style={{color: "var(--extra-light)", cursor: "pointer"}}>reset</span></p>
             </>
     )
 }

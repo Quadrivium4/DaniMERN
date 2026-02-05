@@ -19,6 +19,7 @@ export type TSubcourse = {
     coverImg: TImage,
     promoVideo: string,
     promoDescription: string,
+    progress?: number,
     files: TFile[],
     id: string
 }

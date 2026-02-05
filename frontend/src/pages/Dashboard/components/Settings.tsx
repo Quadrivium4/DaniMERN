@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { protectedUrl } from "../../../App";
 import FileUpload from "../../../components/FileUpload/FileUpload.tsx";
-import { useUser, useUserDispatch } from "../../../Context.tsx";
+import { useUser, useUserDispatch, useUserInfo } from "../../../Context.tsx";
 import { deleteUser, logout } from "../../../controllers";
 import CopyField from "./CopyField";
 import { ReactNode, useRef, useState } from "react";
@@ -14,7 +14,7 @@ const Settings = () =>{
     const dispatch = useUserDispatch();
     const navigate = useNavigate();
     const user = useUser();
-    const {info} = user;
+    const info  = useUserInfo()
     const profileImgPreview = useRef(null);
     const [pop,setPop] = useState<ReactNode>(null);
 

@@ -1,22 +1,34 @@
-import  { createContext, useContext, useReducer, useEffect } from "react";
+import  { createContext, useContext, useReducer, useEffect, Reducer } from "react";
 import { redirect } from "react-router-dom";
 import { getUser } from "./controllers";
-export const UserContext = createContext<any>(null);
+import { TFile, TSubcourse } from "./pages/Admin/Dashboard/Components/EditSubcourse/EditSubcourse";
+export const UserContext = createContext<GlobalState | null>(null);
 export const UserDispatchContext =createContext<any>(null);
+type TUser = {
+    name: string,
+    email: string,
+    profileImg: TFile
+}
+type GlobalState = {
+    isLogged: boolean,
+    loading: boolean,
+    info: TUser | null,
+    subcourses: TSubcourse[],
 
+} ;
 
 const initialState = {
     isLogged: false,
     loading: true,
     info: null,
-    courses: null,
-    subcourses: null,
-    discounts: null,
-    videos: null,
-    store: null,
+    courses: [],
+    subcourses: [],
+    // discounts: null,
+    // videos: null,
+    // store: null,
 }
 
-const userReducer = (state: any, action: {value: any, type: string}) =>{
+const userReducer: Reducer<GlobalState, any> = (state: any, action: {value: any, type: string}) =>{
     //console.log("state:", state, "action:", action)
     console.log(action)
     switch(action.type){
@@ -86,8 +98,16 @@ export const Context = ({children}:{children: any}) =>{
 }
 
 export function useUser(){
+    let userContext = useContext(UserContext);
+    if(!userContext) throw new Error("user context must be used inside context provider")
     //console.log("contexttt", useContext(UserContext));
-    return useContext(UserContext);
+    return userContext;
+}
+export function useUserInfo(){
+    let userContext = useContext(UserContext);
+    if(!userContext || !userContext.info) throw new Error("user context info not found")
+    //console.log("contexttt", useContext(UserContext));
+    return userContext.info;
 }
 export const useUserDispatch  = () =>{
     return useContext(UserDispatchContext);

@@ -2,36 +2,38 @@ import { Link, useNavigate } from "react-router-dom";
 import { protectedUrl } from "../../../App";
 import FileUpload from "../../../components/FileUpload/FileUpload";
 import { useUser, useUserDispatch } from "../../../Context.tsx";
-import { deleteUser, getCourses, getSubcourse, getSubcourses, logout, updateCourseProgress } from "../../../controllers";
+import { deleteUser, getCourses, getSubcourse, getSubcourseData, getSubcourses, logout, updateCourseProgress } from "../../../controllers";
 import CopyField from "./CopyField";
 import { useEffect, useRef, useState } from "react";
 import accountImg from "../../../assets/images/account-picture.png"
+import { TSubcourse } from "../../Admin/Dashboard/Components/EditSubcourse/EditSubcourse.tsx";
+import { wait } from "@testing-library/user-event/dist/utils/index";
 
 const Courses = () =>{
     const dispatch = useUserDispatch();
     const navigate = useNavigate();
     const user = useUser();
-    const {info, courses, subcourses} = user;
+    const {info, subcourses} = user;
     const [status, setStatus]= useState<string>()
     const profileImgPreview = useRef(null);
     useEffect(()=>{
  
-            if(!courses || !subcourses){
+            if(!subcourses){
                 console.log('hello');
                 setStatus("loading")
                 const getData = async()=>{
                     console.log("get Data runned")
-                    const {courses} = await getCourses();
+                    //const {courses} = await getCourses();
                     const {subcourses} = await getSubcourses();
                     
-                    dispatch({type: "SET_COURSES", value: courses});
+                    //dispatch({type: "SET_COURSES", value: courses});
                     dispatch({type: "SET_SUBCOURSES", value: subcourses});
                 }
                 getData().then(()=>{
                     setStatus("finished")
                 })
             }else{
-                console.log("courses and sub", courses, subcourses)
+                console.log("courses and sub", subcourses)
             }
         },[])
     const uploadImage = (img: File) => {
@@ -73,15 +75,12 @@ const Courses = () =>{
                 <h2>Sottocorsi</h2> */}
                 <div className="scroller-wrap">
                     <div className="scroller">
-                        {status === "loading"? <p>loading</p> : subcourses?.map((subcourse: any)=>{
+                        {status === "loading"? <p>loading</p> : subcourses?.map((subcourse: TSubcourse)=>{
                             return (
                                 <>
-                                <Link to={"/view/" + subcourse._id} state={{type: "subcourse", course: subcourse }}  key={subcourse._id}>
-                                    <div className="subcourse" >
-                                        <img src={subcourse.coverImg.url} alt="" />
-                                        <h2 className="title"><b>{subcourse.name}</b></h2>
-                                    </div>
+                                <Link to={"/view/" + subcourse.id} state={{type: "subcourse", course: subcourse }}  key={subcourse.id}>
                                     
+                                    <Course subcourse={subcourse} />
                                 </Link>
                                 {/* <button onClick={()=>{
                                         
@@ -99,6 +98,34 @@ const Courses = () =>{
                     <p style={{paddingTop: 10}}>Acquista altri corsi</p>
                 </Link>
             </div>
+    )
+}
+const Course = ({subcourse}: {subcourse: TSubcourse}) =>{
+    const [totalTime, setTotalTime] = useState();
+    const [progress, setProgress] = useState(0)
+    const [loading, setLoading] = useState(true)
+    useEffect(()=>{
+        getSubcourseData(subcourse.id).then(async(res) =>{
+            await wait(1000)
+            const {duration, videoNumber} = res.data
+            console.log(res)
+            setTotalTime(duration);
+            if(subcourse.progress){
+                setProgress(subcourse.progress/duration * 100)
+            }
+           setLoading(false)
+            
+        })
+    },[])
+    return (
+        <div className="subcourse" >
+            <img src={subcourse.coverImg.url} alt="" />
+            <h2 className="title"><b>{subcourse.name}</b></h2>
+            {/* <p>{subcourse.progress}, {totalTime}</p> */}
+            <div className={`progress-bar`}>
+                <div className={`progress ${loading? "loading" : ""}`} style={{width: progress + "%"}}></div>
+            </div>
+        </div>
     )
 }
 export default Courses;
